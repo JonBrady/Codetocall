@@ -1,0 +1,141 @@
+[
+  {
+    "name": "United Kingdom",
+    "iso2": "GB",
+    "callingCode": "44",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "020 7123 4567",
+      "international": "+44 20 7123 4567",
+      "mobileNational": "07911 123 456",
+      "mobileInternational": "+44 7911 123 456"
+    },
+    "notes": [
+      "When calling the UK from abroad, drop the leading 0 (trunk prefix).",
+      "UK numbers are often written with (0) in the area code to show the trunk prefix is optional internationally."
+    ]
+  },
+  {
+    "name": "United States",
+    "iso2": "US",
+    "callingCode": "1",
+    "trunkPrefix": null,
+    "examples": {
+      "national": "(415) 555-2671",
+      "international": "+1 415 555 2671"
+    },
+    "notes": [
+      "The US uses the North American Numbering Plan (NANP) country code +1.",
+      "Domestic dialing rules vary by area; internationally you generally dial +1 followed by the 10-digit number."
+    ]
+  },
+  {
+    "name": "Canada",
+    "iso2": "CA",
+    "callingCode": "1",
+    "trunkPrefix": null,
+    "examples": {
+      "national": "(604) 555-0123",
+      "international": "+1 604 555 0123"
+    },
+    "notes": [
+      "Canada shares country code +1 (NANP) with the US and others.",
+      "International format is +1 followed by the 10-digit number."
+    ]
+  },
+  {
+    "name": "France",
+    "iso2": "FR",
+    "callingCode": "33",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "01 44 55 66 77",
+      "international": "+33 1 44 55 66 77"
+    },
+    "notes": [
+      "When calling France from abroad, drop the leading 0."
+    ]
+  },
+  {
+    "name": "Germany",
+    "iso2": "DE",
+    "callingCode": "49",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "030 123456",
+      "international": "+49 30 123456"
+    },
+    "notes": [
+      "When calling Germany from abroad, drop the leading 0."
+    ]
+  },
+  {
+    "name": "Spain",
+    "iso2": "ES",
+    "callingCode": "34",
+    "trunkPrefix": null,
+    "examples": {
+      "national": "912 34 56 78",
+      "international": "+34 912 34 56 78"
+    },
+    "notes": [
+      "Spain does not use a separate trunk prefix 0 for geographic numbers in the same way as some other European countries.",
+      "International format is +34 followed by the national number."
+    ]
+  },
+  {
+    "name": "Italy",
+    "iso2": "IT",
+    "callingCode": "39",
+    "trunkPrefix": null,
+    "examples": {
+      "national": "06 6982",
+      "international": "+39 06 6982"
+    },
+    "notes": [
+      "Italy is special: the leading 0 of many fixed-line numbers is often dialed even from abroad.",
+      "This MVP does not attempt to model Italy’s full fixed/mobile rules — we keep normalization simple and show warnings when a leading 0 is present."
+    ]
+  },
+  {
+    "name": "Ireland",
+    "iso2": "IE",
+    "callingCode": "353",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "01 234 5678",
+      "international": "+353 1 234 5678"
+    },
+    "notes": [
+      "When calling Ireland from abroad, drop the leading 0."
+    ]
+  },
+  {
+    "name": "Australia",
+    "iso2": "AU",
+    "callingCode": "61",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "02 1234 5678",
+      "international": "+61 2 1234 5678",
+      "mobileNational": "0412 345 678",
+      "mobileInternational": "+61 412 345 678"
+    },
+    "notes": [
+      "When calling Australia from abroad, drop the leading 0."
+    ]
+  },
+  {
+    "name": "India",
+    "iso2": "IN",
+    "callingCode": "91",
+    "trunkPrefix": "0",
+    "examples": {
+      "national": "080 1234 5678",
+      "international": "+91 80 1234 5678"
+    },
+    "notes": [
+      "When calling India from abroad, drop the leading 0 if present."
+    ]
+  }
+]

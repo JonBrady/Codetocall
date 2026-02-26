@@ -1,17 +1,39 @@
 ---
+import Layout from '../components/Layout.astro';
+import countries from '../data/countries.json';
 
+const title = 'International Country Calling Codes + Dial Builder';
+const description = 'Fast, static pages for every country calling code, plus a dial builder that generates the exact dial string (+E.164 and legacy exit-code formats).';
+
+const sorted = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title={title} description={description}>
+  <h1 style="margin: 22px 0 8px;">International calling codes, done for real-world dialing</h1>
+  <p class="small" style="max-width: 70ch;">
+    Most sites stop at “country code is X”. This one answers the actual question: <strong>what do I dial?</strong>
+    Use the <a href="/dial-builder/">Dial Builder</a> to normalize messy numbers and generate the exact dial string.
+  </p>
+
+  <div class="grid" style="margin-top: 18px;">
+    <div class="card">
+      <h2 style="margin-top:0">Dial Builder</h2>
+      <p class="small">Pick “calling from”, “calling to”, paste any phone number — get:</p>
+      <ul>
+        <li>Mobile-friendly: <span class="kbd">+&#123;countryCode&#125;&#123;nationalNumber&#125;</span></li>
+        <li>Legacy: <span class="kbd">&#123;exitCode&#125; &#123;countryCode&#125; &#123;nationalNumber&#125;</span></li>
+      </ul>
+      <a href="/dial-builder/">Open Dial Builder →</a>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Country calling codes (starter set)</h2>
+      <p class="small">MVP dataset is 10 countries to start. We’ll expand safely + validate as we go.</p>
+      <ul>
+        {sorted.map((c) => (
+          <li><a href={`/country/${c.iso2.toLowerCase()}/`}>{c.name}</a> <span class="small">(+{c.callingCode})</span></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,36 @@
+---
+import Layout from '../components/Layout.astro';
+
+const title = 'About the data';
+const description = 'Where the calling-code dataset comes from, how it is stored, and what limitations exist in the MVP.';
+---
+
+<Layout title={title} description={description}>
+  <h1 style="margin: 22px 0 6px;">About the data</h1>
+  <div class="card" style="margin-top: 14px;">
+    <p class="small">
+      Phase 1 is intentionally <strong>static-first</strong>: the calling code data lives as versioned JSON inside this repo.
+      That keeps the site cheap and immune to per-request compute bills.
+    </p>
+
+    <h2>What’s included (MVP)</h2>
+    <ul>
+      <li>Country name + ISO2 code</li>
+      <li>Country calling code (digits only)</li>
+      <li>Trunk prefix (if commonly used)</li>
+      <li>Example formats + simple notes</li>
+      <li>Origin exit codes (IDD prefix) for legacy formatting</li>
+    </ul>
+
+    <h2>Limitations</h2>
+    <ul>
+      <li>This is not a full libphonenumber replacement (yet).</li>
+      <li>Some countries have nuanced rules (e.g., Italy fixed lines) that need special-casing.</li>
+      <li>Some calling codes are shared (e.g., NANP +1). We model that but keep parsing simple in Phase 1.</li>
+    </ul>
+
+    <h2>Verification</h2>
+    <p class="small">The repo includes a dataset validator script so changes are safe and deterministic.</p>
+    <p><span class="kbd">npm run validate-data</span></p>
+  </div>
+</Layout>

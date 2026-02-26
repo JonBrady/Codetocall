@@ -1,0 +1,206 @@
+---
+import Layout from '../components/Layout.astro';
+import countries from '../data/countries.json';
+import exitCodes from '../data/exitCodes.json';
+
+const title = 'Dial Builder — generate the exact dial string';
+const description = 'Pick origin + destination, paste a phone number, and get both +E.164 and legacy exit-code dial strings with copy buttons.';
+
+const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Layout title={title} description={description}>
+  <h1 style="margin: 22px 0 6px;">Dial Builder</h1>
+  <p class="small" style="max-width: 75ch;">
+    Paste any messy phone number (spaces, dashes, parentheses). We’ll normalize it and output:
+    <strong>+E.164</strong> (mobile-friendly) and a <strong>legacy</strong> format (exit code + country code + national number).
+  </p>
+
+  <div class="card" style="margin-top: 14px;">
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div>
+        <label for="from">Calling from</label>
+        <select id="from">
+          {countryOptions.map((c) => (
+            <option value={c.iso2}>{c.name} ({c.iso2})</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label for="to">Calling to</label>
+        <select id="to">
+          {countryOptions.map((c) => (
+            <option value={c.iso2}>{c.name} ({c.iso2})</option>
+          ))}
+        </select>
+      </div>
+
+      <div style="grid-column: 1 / -1;">
+        <label for="num">Phone number</label>
+        <input id="num" type="text" placeholder="e.g. 07911 123 456, (0)20 7123 4567, +33 (0)1 44 55 66 77" />
+        <div class="small" style="margin-top: 8px;">
+          Tip: You can link to this page pre-filled using query params like <span class="kbd">?from=GB&to=FR</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="outputs">
+      <div class="outputRow">
+        <div style="min-width: 140px;" class="small">Mobile-friendly</div>
+        <code class="kbd" id="outE164">—</code>
+        <button type="button" id="copyE164">Copy</button>
+      </div>
+
+      <div class="outputRow">
+        <div style="min-width: 140px;" class="small">Landline / legacy</div>
+        <code class="kbd" id="outLegacy">—</code>
+        <button type="button" id="copyLegacy">Copy</button>
+      </div>
+    </div>
+
+    <div id="warnings" class="small" style="margin-top: 12px;"></div>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h2 style="margin-top:0">Number normalizer</h2>
+    <p class="small">
+      The same deterministic normalizer powers this builder.
+      If your number starts with <span class="kbd">+</span>, we treat it as international and just normalize formatting.
+      Otherwise we treat it as a national number for the destination and (when configured) drop the trunk prefix.
+    </p>
+  </div>
+
+  <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
+  <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
+
+  <script>
+    const countries = JSON.parse(document.getElementById('data-countries').textContent);
+    const exitCodes = JSON.parse(document.getElementById('data-exit').textContent);
+
+    const byIso2 = new Map(countries.map(c => [c.iso2, c]));
+
+    const $from = document.getElementById('from');
+    const $to = document.getElementById('to');
+    const $num = document.getElementById('num');
+    const $outE164 = document.getElementById('outE164');
+    const $outLegacy = document.getElementById('outLegacy');
+    const $warnings = document.getElementById('warnings');
+
+    function stripFormatting(input) {
+      const trimmed = (input || '').trim();
+      const hasPlus = trimmed.startsWith('+');
+      const digitsOnly = trimmed.replace(/[^0-9]/g, '');
+      return hasPlus ? `+${digitsOnly}` : digitsOnly;
+    }
+
+    function removeOptionalZeroMarker(input) {
+      return (input || '').replace(/\(0\)/g, '');
+    }
+
+    function findCountryByCallingCodePrefix(digits) {
+      const matches = countries
+        .filter(c => digits.startsWith(c.callingCode))
+        .sort((a, b) => b.callingCode.length - a.callingCode.length);
+      return matches[0];
+    }
+
+    function normalizeForDestination(raw, destination) {
+      const warnings = [];
+      const raw0 = removeOptionalZeroMarker(raw);
+      const stripped = stripFormatting(raw0);
+
+      if (stripped.startsWith('+')) {
+        const digits = stripped.slice(1);
+        const c = findCountryByCallingCodePrefix(digits);
+        if (!c) {
+          warnings.push('This looks like an international number (+...), but the country code is not recognized in the current dataset.');
+          return { e164: `+${digits}`, nsn: null, warnings };
+        }
+        const nsn = digits.slice(c.callingCode.length);
+        return { e164: `+${c.callingCode}${nsn}`, nsn, warnings };
+      }
+
+      let national = stripped;
+      if (!national) {
+        warnings.push('Enter a phone number.');
+        return { e164: null, nsn: null, warnings };
+      }
+
+      const trunk = destination.trunkPrefix;
+      if (trunk && national.startsWith(trunk)) {
+        national = national.slice(trunk.length);
+        warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
+      } else if (trunk && /^(0)+/.test(national)) {
+        warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
+      }
+
+      return { e164: `+${destination.callingCode}${national}`, nsn: national, warnings };
+    }
+
+    function update() {
+      const origin = byIso2.get($from.value);
+      const dest = byIso2.get($to.value);
+      const raw = $num.value;
+
+      if (!origin || !dest) {
+        $outE164.textContent = '—';
+        $outLegacy.textContent = '—';
+        $warnings.textContent = 'Choose both an origin and destination country.';
+        return;
+      }
+
+      const { e164, nsn, warnings } = normalizeForDestination(raw, dest);
+      $outE164.textContent = e164 ?? '—';
+
+      const exit = exitCodes[origin.iso2];
+      if (!exit) warnings.push(`No exit code (IDD prefix) configured for ${origin.name} yet.`);
+      $outLegacy.textContent = exit && nsn ? `${exit} ${dest.callingCode} ${nsn}` : '—';
+
+      $warnings.innerHTML = warnings.length
+        ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
+        : '';
+
+      // Keep URL in sync (cheap “shareable builder” feature)
+      const url = new URL(window.location.href);
+      url.searchParams.set('from', origin.iso2);
+      url.searchParams.set('to', dest.iso2);
+      history.replaceState({}, '', url);
+    }
+
+    async function copyText(text) {
+      if (!text || text === '—') return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+    }
+
+    document.getElementById('copyE164').addEventListener('click', () => copyText($outE164.textContent));
+    document.getElementById('copyLegacy').addEventListener('click', () => copyText($outLegacy.textContent));
+
+    $from.addEventListener('change', update);
+    $to.addEventListener('change', update);
+    $num.addEventListener('input', update);
+
+    // Init from query params
+    const q = new URLSearchParams(window.location.search);
+    const qFrom = (q.get('from') || '').toUpperCase();
+    const qTo = (q.get('to') || '').toUpperCase();
+    if (byIso2.has(qFrom)) $from.value = qFrom;
+    if (byIso2.has(qTo)) $to.value = qTo;
+
+    // Sensible defaults for demo
+    if (!qFrom) $from.value = 'GB';
+    if (!qTo) $to.value = 'US';
+
+    update();
+  </script>
+</Layout>

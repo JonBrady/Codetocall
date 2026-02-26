@@ -1,0 +1,128 @@
+---
+import Layout from '../../components/Layout.astro';
+import countries from '../../data/countries.json';
+import exitCodes from '../../data/exitCodes.json';
+
+const iso2 = Astro.params.iso2?.toUpperCase() ?? '';
+const country = countries.find((c) => c.iso2 === iso2);
+
+export function getStaticPaths() {
+  return countries.map((c) => ({ params: { iso2: c.iso2.toLowerCase() } }));
+}
+
+if (!country) {
+  throw new Error(`Unknown country: ${iso2}`);
+}
+
+const title = `${country.name} calling code (+${country.callingCode}) — how to dial`;
+const description = `How to call ${country.name} from abroad: what to dial, trunk-prefix notes, example formats, and a dial builder that outputs exact dial strings.`;
+
+const topOrigins = ['US', 'GB', 'CA', 'IE', 'FR', 'DE', 'ES', 'IT', 'AU', 'IN']
+  .filter((x) => x !== country.iso2);
+
+const faqs = [
+  {
+    q: `What is the country calling code for ${country.name}?`,
+    a: `The country calling code for ${country.name} is +${country.callingCode}.`,
+  },
+  {
+    q: `How do I call ${country.name} from another country?`,
+    a: `Dial your international exit code, then ${country.callingCode}, then the national number. In mobile-friendly format you can usually dial +${country.callingCode} followed by the national number.`,
+  },
+  {
+    q: `Do I drop a leading 0 when calling ${country.name} internationally?`,
+    a: country.trunkPrefix
+      ? `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`
+      : `${country.name} does not generally use a trunk prefix field in this MVP dataset, but formatting varies; use the dial builder to normalize your specific number.`,
+  }
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Layout title={title} description={description}>
+  <h1 style="margin: 22px 0 6px;">{country.name} calling code: <span class="kbd">+{country.callingCode}</span></h1>
+  <p class="small">
+    The short answer is <span class="kbd">+{country.callingCode}</span>. The useful answer is: <strong>what do you dial</strong> from your country, and what should you do with leading zeros?
+  </p>
+
+  <div class="grid" style="margin-top: 14px;">
+    <div class="card">
+      <h2 style="margin-top:0">What to dial (quick guide)</h2>
+      <ol>
+        <li>Start with your <strong>exit code</strong> (international call prefix), or just use <span class="kbd">+</span> on mobiles.</li>
+        <li>Dial <span class="kbd">{country.callingCode}</span> (the country calling code).</li>
+        <li>Dial the <strong>national number</strong> (often with the domestic trunk prefix removed).</li>
+      </ol>
+
+      {country.trunkPrefix ? (
+        <p class="small">
+          Trunk prefix note: domestic numbers may start with <span class="kbd">{country.trunkPrefix}</span>. When calling from abroad, you usually <strong>drop</strong> that leading <span class="kbd">{country.trunkPrefix}</span>.
+        </p>
+      ) : (
+        <p class="small">Trunk prefix note: none listed for this country in the MVP dataset.</p>
+      )}
+
+      <p>
+        Use the <a href={`/dial-builder/?to=${country.iso2}`}>Dial Builder</a> to paste your number and get the exact dial string.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Examples</h2>
+      {country.examples ? (
+        <ul>
+          {Object.entries(country.examples).map(([k, v]) => (
+            <li><span class="small">{k}:</span> <span class="kbd">{v}</span></li>
+          ))}
+        </ul>
+      ) : (
+        <p class="small">No examples yet.</p>
+      )}
+
+      {country.notes?.length ? (
+        <div>
+          <h3>Notes</h3>
+          <ul>
+            {country.notes.map((n) => (
+              <li class="small">{n}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h2 style="margin-top:0">Common routes</h2>
+    <p class="small">Jump straight into the dial builder:</p>
+    <ul>
+      {topOrigins.map((from) => (
+        <li>
+          <a href={`/dial-builder/?from=${from}&to=${country.iso2}`}>Call from {from} to {country.iso2}</a>
+          <span class="small"> (exit code {exitCodes[from] ?? '—'})</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h2 style="margin-top:0">FAQ</h2>
+    {faqs.map((f) => (
+      <details style="margin: 10px 0;">
+        <summary><strong>{f.q}</strong></summary>
+        <p class="small">{f.a}</p>
+      </details>
+    ))}
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+</Layout>
