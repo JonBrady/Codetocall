@@ -17,6 +17,17 @@ const url = canonical ?? Astro.url;
 
     <meta name="generator" content={Astro.generator} />
 
+    <!-- Social cards -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    {description ? <meta property="og:description" content={description} /> : null}
+    <meta property="og:url" content={url.toString()} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    {description ? <meta name="twitter:description" content={description} /> : null}
+
+    <meta name="theme-color" content="#fffdf8" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Time.is uses Montserrat for most text, and a custom clock font (TimeTraveler) for the big digits.
@@ -24,6 +35,14 @@ const url = canonical ?? Astro.url;
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="/styles/global.css" />
+
+    <!-- Basic schema.org (site identity) -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'CodeToCall',
+      url: url.origin,
+    })} />
   </head>
   <body>
     <header class="site">

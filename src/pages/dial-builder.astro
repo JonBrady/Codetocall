@@ -3,8 +3,8 @@ import Layout from '../components/Layout.astro';
 import countries from '../data/countries.json';
 import exitCodes from '../data/exitCodes.json';
 
-const title = 'Dial Builder — generate the exact dial string';
-const description = 'Pick origin + destination, paste a phone number, and get both +E.164 and legacy exit-code dial strings with copy buttons.';
+const title = 'Dial Builder — generate the exact international number to dial';
+const description = 'Pick calling-from and calling-to countries, paste a phone number, and copy the exact international dial string.';
 
 const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 ---
