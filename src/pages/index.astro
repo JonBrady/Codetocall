@@ -58,6 +58,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <div id="altDial" class="small" style="margin-top: 6px;"></div>
       <div id="localDial" class="small" style="margin-top: 6px;"></div>
       <div id="destTime" class="small" style="margin-top: 6px;"></div>
+      <div id="tzWrap" class="small" style="margin-top: 6px; display:none;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
     </div>
   </div>
@@ -126,32 +127,67 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $destTime = document.getElementById('destTime');
     const $timeBand = document.getElementById('timeBand');
     const $timeBandText = document.getElementById('timeBandText');
+    const $tzWrap = document.getElementById('tzWrap');
 
     const timeZonesByIso2 = {
-      GB: 'Europe/London',
-      US: 'America/New_York',
-      CA: 'America/Toronto',
-      IE: 'Europe/Dublin',
-      FR: 'Europe/Paris',
-      DE: 'Europe/Berlin',
-      ES: 'Europe/Madrid',
-      IT: 'Europe/Rome',
-      AU: 'Australia/Sydney',
-      IN: 'Asia/Kolkata'
+      GB: [{ id: 'Europe/London', label: 'UK (London)' }],
+      IE: [{ id: 'Europe/Dublin', label: 'Ireland (Dublin)' }],
+      FR: [{ id: 'Europe/Paris', label: 'France (Paris)' }],
+      DE: [{ id: 'Europe/Berlin', label: 'Germany (Berlin)' }],
+      ES: [{ id: 'Europe/Madrid', label: 'Spain (Madrid)' }],
+      IT: [{ id: 'Europe/Rome', label: 'Italy (Rome)' }],
+      IN: [{ id: 'Asia/Kolkata', label: 'India (Kolkata)' }],
+
+      // Multi-timezone countries: offer a minimal selector.
+      US: [
+        { id: 'America/New_York', label: 'US — Eastern' },
+        { id: 'America/Chicago', label: 'US — Central' },
+        { id: 'America/Denver', label: 'US — Mountain' },
+        { id: 'America/Los_Angeles', label: 'US — Pacific' },
+      ],
+      CA: [
+        { id: 'America/Toronto', label: 'Canada — Eastern' },
+        { id: 'America/Winnipeg', label: 'Canada — Central' },
+        { id: 'America/Edmonton', label: 'Canada — Mountain' },
+        { id: 'America/Vancouver', label: 'Canada — Pacific' },
+      ],
+      AU: [
+        { id: 'Australia/Sydney', label: 'Australia — Sydney' },
+        { id: 'Australia/Brisbane', label: 'Australia — Brisbane' },
+        { id: 'Australia/Adelaide', label: 'Australia — Adelaide' },
+        { id: 'Australia/Perth', label: 'Australia — Perth' },
+      ],
     };
 
-    function formatLocalTime(iso2) {
-      const tz = timeZonesByIso2[iso2];
-      if (!tz) return null;
+    function formatLocalTime(tzId) {
+      if (!tzId) return null;
       try {
         return new Intl.DateTimeFormat(undefined, {
-          timeZone: tz,
+          timeZone: tzId,
           hour: '2-digit',
           minute: '2-digit',
         }).format(new Date());
       } catch {
         return null;
       }
+    }
+
+    let activeDestIso2 = null;
+    let activeTzId = null;
+    let tickTimer = null;
+
+    function startTicker() {
+      if (tickTimer) window.clearInterval(tickTimer);
+      tickTimer = window.setInterval(() => {
+        // Re-render the displayed time every minute.
+        if (!activeDestIso2 || !activeTzId) return;
+        const t = formatLocalTime(activeTzId);
+        const dest = byIso2.get(activeDestIso2);
+        if (!t || !dest) return;
+        $destTime.textContent = `Local time there: ${t}`;
+        $timeBand.style.display = '';
+        $timeBandText.textContent = `${dest.name}: ${t}`;
+      }, 60_000);
     }
 
     function stripFormatting(input) {
@@ -172,24 +208,69 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       return matches[0];
     }
 
-    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText) {
-      $heroNumber.textContent = e164 || '—';
-      $heroMeta.textContent = meta || '';
-      $altDial.textContent = altDialText || '';
-      $localDial.textContent = localDialText || '';
-
-      const t = destIso2 ? formatLocalTime(destIso2) : null;
+    function renderTimeUI(destIso2) {
       const dest = destIso2 ? byIso2.get(destIso2) : null;
+      const tzList = destIso2 ? (timeZonesByIso2[destIso2] || []) : [];
 
+      activeDestIso2 = destIso2 || null;
+
+      if (!dest || !tzList.length) {
+        activeTzId = null;
+        $destTime.textContent = '';
+        $timeBand.style.display = 'none';
+        $timeBandText.textContent = '';
+        $tzWrap.style.display = 'none';
+        $tzWrap.innerHTML = '';
+        return;
+      }
+
+      // Keep previously selected tz if still applicable, otherwise choose the first (default).
+      if (!activeTzId || !tzList.some(z => z.id === activeTzId)) {
+        activeTzId = tzList[0].id;
+      }
+
+      const t = formatLocalTime(activeTzId);
       $destTime.textContent = t ? `Local time there: ${t}` : '';
 
-      if (t && dest) {
+      if (t) {
         $timeBand.style.display = '';
         $timeBandText.textContent = `${dest.name}: ${t}`;
       } else {
         $timeBand.style.display = 'none';
         $timeBandText.textContent = '';
       }
+
+      // Show selector only when there are multiple zones.
+      if (tzList.length > 1) {
+        $tzWrap.style.display = '';
+        $tzWrap.innerHTML = `Time zone: <select id="tzSelect"></select>`;
+        const sel = document.getElementById('tzSelect');
+        tzList.forEach(z => {
+          const opt = document.createElement('option');
+          opt.value = z.id;
+          opt.textContent = z.label;
+          sel.appendChild(opt);
+        });
+        sel.value = activeTzId;
+        sel.addEventListener('change', () => {
+          activeTzId = sel.value;
+          renderTimeUI(activeDestIso2);
+        });
+      } else {
+        $tzWrap.style.display = 'none';
+        $tzWrap.innerHTML = '';
+      }
+
+      startTicker();
+    }
+
+    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText) {
+      $heroNumber.textContent = e164 || '—';
+      $heroMeta.textContent = meta || '';
+      $altDial.textContent = altDialText || '';
+      $localDial.textContent = localDialText || '';
+
+      renderTimeUI(destIso2);
 
       $warnings.innerHTML = (warnings && warnings.length)
         ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
