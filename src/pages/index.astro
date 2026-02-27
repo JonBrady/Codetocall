@@ -251,6 +251,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         sel.addEventListener('change', () => {
           activeTzId = sel.value;
           renderTimeUI(activeDestIso2);
+          syncUrl();
         });
       } else {
         $tzWrap.style.display = 'none';
@@ -354,6 +355,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         $to.value = detectedDestIso2;
       }
 
+      syncUrl();
+
       const finalDest = byIso2.get($to.value);
 
       // Build a “landline / older phone” dial string using the origin exit code (IDD prefix), if available.
@@ -416,9 +419,37 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     $to.addEventListener('change', update);
     $num.addEventListener('input', update);
 
+    function syncUrl() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('from', $from.value);
+      url.searchParams.set('to', $to.value);
+      if ($num.value && $num.value.trim()) url.searchParams.set('num', $num.value);
+      else url.searchParams.delete('num');
+      if (activeTzId) url.searchParams.set('tz', activeTzId);
+      else url.searchParams.delete('tz');
+      history.replaceState({}, '', url);
+    }
+
+    // Restore from query params
+    const q = new URLSearchParams(window.location.search);
+    const qFrom = (q.get('from') || '').toUpperCase();
+    const qTo = (q.get('to') || '').toUpperCase();
+    const qNum = q.get('num') || '';
+    const qTz = q.get('tz') || '';
+
     // Defaults for a useful first impression.
-    $to.value = 'US';
-    $from.value = 'GB';
+    $to.value = byIso2.has(qTo) ? qTo : 'US';
+    $from.value = byIso2.has(qFrom) ? qFrom : 'GB';
+    if (qNum) $num.value = qNum;
+    if (qTz) activeTzId = qTz;
+
     update();
+    syncUrl();
+
+    // Keep URL in sync while typing/choosing.
+    $from.addEventListener('change', syncUrl);
+    $to.addEventListener('change', syncUrl);
+    $num.addEventListener('input', syncUrl);
+
   </script>
 </Layout>
