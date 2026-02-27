@@ -257,7 +257,23 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
     }
 
-    document.getElementById('copyBtn').addEventListener('click', () => copyText($heroNumber.textContent));
+    async function copyWithFeedback() {
+      const text = $heroNumber.textContent;
+      if (!text || text === '—') return;
+
+      await copyText(text);
+
+      const prev = $copyBtn.textContent;
+      $copyBtn.textContent = 'Copied ✓';
+      $copyBtn.classList.add('success', 'flash');
+      window.setTimeout(() => $copyBtn.classList.remove('flash'), 600);
+      window.setTimeout(() => {
+        $copyBtn.textContent = prev;
+        $copyBtn.classList.remove('success');
+      }, 1200);
+    }
+
+    document.getElementById('copyBtn').addEventListener('click', copyWithFeedback);
 
     $from.addEventListener('change', update);
     $to.addEventListener('change', update);

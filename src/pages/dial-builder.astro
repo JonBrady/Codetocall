@@ -183,8 +183,25 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
     }
 
-    document.getElementById('copyE164').addEventListener('click', () => copyText($outE164.textContent));
-    document.getElementById('copyLegacy').addEventListener('click', () => copyText($outLegacy.textContent));
+    async function copyWithFeedback(btn, text) {
+      const t = (text || '').trim();
+      if (!t || t === '—') return;
+      await copyText(t);
+
+      const prev = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('success', 'flash');
+      window.setTimeout(() => btn.classList.remove('flash'), 600);
+      window.setTimeout(() => {
+        btn.textContent = prev;
+        btn.classList.remove('success');
+      }, 1200);
+    }
+
+    const $copyE164 = document.getElementById('copyE164');
+    const $copyLegacy = document.getElementById('copyLegacy');
+    $copyE164.addEventListener('click', () => copyWithFeedback($copyE164, $outE164.textContent));
+    $copyLegacy.addEventListener('click', () => copyWithFeedback($copyLegacy, $outLegacy.textContent));
 
     $from.addEventListener('change', update);
     $to.addEventListener('change', update);
