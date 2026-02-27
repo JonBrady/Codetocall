@@ -69,9 +69,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     <div class="card">
       <h2 style="margin-top:0">Popular destinations</h2>
       <p class="small">Quick links (starter set). We’ll expand safely.</p>
-      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+      <div class="tileRow" aria-label="Popular destinations">
         {countryOptions.slice(0, 10).map((c) => (
-          <a class="kbd" href={`/country/${c.iso2.toLowerCase()}/`}>{c.name} (+{c.callingCode})</a>
+          <a class="tile" href={`/country/${c.iso2.toLowerCase()}/`}>
+            <div class="tileTitle">{c.name}</div>
+            <div class="tileSub">+{c.callingCode}</div>
+          </a>
         ))}
       </div>
     </div>
