@@ -1,26 +1,33 @@
 :root{
-  /* Time.is-inspired: clean, light, utility-first */
-  --bg:#ffffff;
+  /* Time.is-inspired: clean, paper-white + charcoal */
+  --bg:#fffdf8;
   --panel:#ffffff;
-  --text:#111111;
-  --muted:#555555;
-  --link:#0b57d0;
-  --adBg:#fafafa;
-  --adBorder:rgba(0,0,0,.18);
-  --border:rgba(0,0,0,.14);
-  --borderSoft:rgba(0,0,0,.08);
+  --text:#2f2f2f;
+  --muted:#5a5a5a;
+  --link:#1a73e8;
+
+  --border:rgba(0,0,0,.18);
+  --borderSoft:rgba(0,0,0,.10);
   --shadow:none;
   --max:900px;
+
+  /* Small RGB accents */
+  --r:#d93025;
+  --g:#188038;
+  --b:#1a73e8;
+
+  --adBg:#fafafa;
+  --adBorder:rgba(0,0,0,.22);
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.45}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.45}
 a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
 
 .container{max-width:var(--max);margin:0 auto;padding:28px 18px}
 
-header.site{border-bottom:1px solid var(--borderSoft);background:var(--bg)}
+header.site{border-bottom:1px solid var(--borderSoft);background:var(--bg); border-top:3px solid var(--r)}
 header .row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0}
 nav a{margin-left:14px;color:var(--muted)}
 nav a:hover{color:var(--text)}
@@ -28,23 +35,24 @@ nav a:hover{color:var(--text)}
 .card{background:var(--panel);border:1px solid var(--borderSoft);border-radius:8px;padding:18px;box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 .small{color:var(--muted);font-size:.95rem}
-.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.95em;background:rgba(0,0,0,.03);border:1px solid var(--borderSoft);padding:2px 6px;border-radius:8px}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.95em;background:rgba(26,115,232,.08);border:1px solid rgba(26,115,232,.22);padding:2px 6px;border-radius:999px}
 
 input,select,button,textarea{font:inherit}
 label{display:block;margin:10px 0 6px;font-weight:600}
-input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--borderSoft);background:#fff;color:var(--text)}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(26,115,232,.25); outline-offset:1px; border-color: rgba(26,115,232,.35)}
 input::placeholder{color:#8a8a8a}
-button{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer}
+button{padding:10px 12px;border-radius:10px;border:1px solid var(--borderSoft);background:#fff;color:var(--text);cursor:pointer}
 button:hover{background:rgba(0,0,0,.03)}
 button:disabled{opacity:.55;cursor:not-allowed}
 
 /* Hero */
 .hero{padding-top:2px}
-.heroNumber{font-size: clamp(40px, 7vw, 78px); font-weight: 800; letter-spacing: .01em; margin-top: 6px; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word}
+.heroNumber{font-family:"Archivo Black", Inter, system-ui, sans-serif; font-size: clamp(42px, 7vw, 84px); font-weight: 400; letter-spacing: .01em; margin-top: 8px; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word; color:#333}
 .heroActions{display:flex; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
-.btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: #fff; color: var(--text)}
+.btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--borderSoft); background: #fff; color: var(--text)}
 .btn:hover{background:rgba(0,0,0,.03); text-decoration:none}
-.btn.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn.primary{background:var(--b);color:#fff;border-color:var(--b)}
 .btn.primary:hover{opacity:.9}
 .btn.disabled{opacity:.55; pointer-events:none}
 

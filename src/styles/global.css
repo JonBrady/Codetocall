@@ -1,14 +1,18 @@
 :root{
-  /* Time.is-inspired: clean, light, utility-first */
-  --bg:#ffffff;
+  /* Time.is-inspired: clean, paper-white + charcoal */
+  --bg:#fffdf8;
   --panel:#ffffff;
-  --text:#111111;
-  --muted:#555555;
-  --link:#0b57d0;
-  --border:rgba(0,0,0,.14);
-  --borderSoft:rgba(0,0,0,.08);
-  --shadow:0 1px 2px rgba(0,0,0,.06);
+  --text:#2f2f2f;
+  --muted:#5a5a5a;
+  --link:#1a73e8;
+  --border:rgba(0,0,0,.18);
+  --borderSoft:rgba(0,0,0,.10);
+  --shadow:none;
   --max:900px;
+
+  --r:#d93025;
+  --g:#188038;
+  --b:#1a73e8;
 }
 
 /* Optional dark mode later; keep light as default for the Time.is feel. */

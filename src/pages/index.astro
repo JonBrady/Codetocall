@@ -60,6 +60,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         <a class="small" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
       </div>
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
+      <div id="destTime" class="small" style="margin-top: 6px;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
     </div>
   </div>
@@ -116,6 +117,34 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $warnings = document.getElementById('warnings');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
+    const $destTime = document.getElementById('destTime');
+
+    const timeZonesByIso2 = {
+      GB: 'Europe/London',
+      US: 'America/New_York',
+      CA: 'America/Toronto',
+      IE: 'Europe/Dublin',
+      FR: 'Europe/Paris',
+      DE: 'Europe/Berlin',
+      ES: 'Europe/Madrid',
+      IT: 'Europe/Rome',
+      AU: 'Australia/Sydney',
+      IN: 'Asia/Kolkata'
+    };
+
+    function formatLocalTime(iso2) {
+      const tz = timeZonesByIso2[iso2];
+      if (!tz) return null;
+      try {
+        return new Intl.DateTimeFormat(undefined, {
+          timeZone: tz,
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(new Date());
+      } catch {
+        return null;
+      }
+    }
 
     function stripFormatting(input) {
       const trimmed = (input || '').trim();
@@ -135,9 +164,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       return matches[0];
     }
 
-    function setHero(e164, meta, warnings) {
+    function setHero(e164, meta, warnings, destIso2) {
       $heroNumber.textContent = e164 || '—';
       $heroMeta.textContent = meta || '';
+
+      const t = destIso2 ? formatLocalTime(destIso2) : null;
+      $destTime.textContent = t ? `Local time there: ${t}` : '';
 
       $warnings.innerHTML = (warnings && warnings.length)
         ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
@@ -163,7 +195,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       const warnings = [];
 
       if (!origin) {
-        setHero(null, '', ['Choose an origin country.']);
+        setHero(null, '', ['Choose an origin country.'], null);
         return;
       }
 
@@ -177,7 +209,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         if (!dest) {
           setHero(`+${digits}`, 'International number (country code not recognized in the current dataset).', [
             'We can’t identify the destination country from this +... number with the current dataset. The dial string is still shown as-is.',
-          ]);
+          ], null);
           $destWrap.style.display = 'none';
           $to.value = '';
           return;
@@ -185,7 +217,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
         const nsn = digits.slice(dest.callingCode.length);
         const e164 = `+${dest.callingCode}${nsn}`;
-        setHero(e164, `Detected destination: ${dest.name} (+${dest.callingCode})`, warnings);
+        setHero(e164, `Detected destination: ${dest.name} (+${dest.callingCode})`, warnings, dest.iso2);
         $destWrap.style.display = 'none';
         $to.value = '';
         return;
@@ -199,12 +231,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       const dest = toIso2 ? byIso2.get(toIso2) : null;
 
       if (!stripped) {
-        setHero(null, '', ['Enter a phone number.']);
+        setHero(null, '', ['Enter a phone number.'], null);
         return;
       }
 
       if (!dest) {
-        setHero(null, 'Choose a destination to generate the exact international dial string.', warnings);
+        setHero(null, 'Choose a destination to generate the exact international dial string.', warnings, null);
         return;
       }
 
@@ -219,7 +251,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
 
       const e164 = `+${dest.callingCode}${national}`;
-      setHero(e164, `Destination: ${dest.name} (+${dest.callingCode})`, warnings);
+      setHero(e164, `Destination: ${dest.name} (+${dest.callingCode})`, warnings, dest.iso2);
     }
 
     async function copyText(text) {
