@@ -75,7 +75,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <h2 style="margin-top:0">Popular destinations</h2>
       <div class="tileRow" aria-label="Popular destinations">
         {countryOptions.slice(0, 10).map((c) => (
-          <a class="tile" href={`/country/${c.iso2.toLowerCase()}/`}>
+          <a class="tile" data-iso2={c.iso2} href={`/country/${c.iso2.toLowerCase()}/`}>
             <div class="tileTitle">{c.name}</div>
             <div class="tileSub">+{c.callingCode}</div>
           </a>
@@ -235,10 +235,19 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       return { e164: `+${destination.callingCode}${national}`, nsn: national, warnings, detectedDestIso2: null };
     }
 
+    function setTileSelection(iso2) {
+      document.querySelectorAll('.tileRow .tile').forEach((el) => {
+        const v = (el.getAttribute('data-iso2') || '').toUpperCase();
+        el.classList.toggle('selected', !!iso2 && v === iso2.toUpperCase());
+      });
+    }
+
     function update() {
       const origin = byIso2.get($from.value);
       const dest = byIso2.get($to.value);
       const raw = $num.value;
+
+      setTileSelection(dest ? dest.iso2 : null);
 
       if (!origin || !dest) {
         setHero(null, '', ['Choose both “calling to” and “calling from”.'], null);

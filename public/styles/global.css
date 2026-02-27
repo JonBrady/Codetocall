@@ -69,10 +69,12 @@ footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;
 
 /* Tiles (Time.is-inspired layout, but our own styling) */
 .tileRow{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
-.tile{display:block;min-width:140px;flex:0 0 auto;padding:10px 14px;border-radius:0;border:1px solid var(--borderSoft);background:#f1f1f1;color:var(--text);text-decoration:none}
-.tile:hover{background:#e9e9e9;text-decoration:none}
-.tileTitle{font-weight:800;letter-spacing:.01em}
+.tile{display:block;min-width:140px;flex:0 0 auto;padding:10px 14px;border-radius:0;border:1px solid var(--borderSoft);background:#e0e0e0;color:var(--text);text-decoration:none}
+.tile:hover{background:#d6d6d6;text-decoration:none}
+.tileTitle{font-weight:900;letter-spacing:.01em}
 .tileSub{margin-top:2px;color:var(--text)}
+.tile.selected{background:#6a6a6a;border-color:#6a6a6a;color:#fff}
+.tile.selected .tileTitle,.tile.selected .tileSub{color:#fff}
 
 @media (max-width: 520px){
   .tile{min-width:120px;flex:1 1 120px}
