@@ -422,6 +422,19 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $brandHome = document.getElementById('brandHome');
     const $advancedLink = document.getElementById('advancedLink');
 
+    const STATE_KEY = 'codetocall_home_state_v1';
+
+    function persistState() {
+      try {
+        localStorage.setItem(STATE_KEY, JSON.stringify({
+          from: $from.value,
+          to: $to.value,
+          num: $num.value,
+          tz: activeTzId || ''
+        }));
+      } catch {}
+    }
+
     function syncUrl() {
       const url = new URL(window.location.href);
       url.searchParams.set('from', $from.value);
@@ -431,6 +444,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if (activeTzId) url.searchParams.set('tz', activeTzId);
       else url.searchParams.delete('tz');
       history.replaceState({}, '', url);
+
+      persistState();
 
       // Keep the logo/home link preserving state
       if ($brandHome) $brandHome.href = `/?${url.searchParams.toString()}`;
@@ -443,18 +458,27 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if ($advancedLink) $advancedLink.href = adv.pathname + '?' + adv.searchParams.toString();
     }
 
-    // Restore from query params
+    // Restore from query params (or localStorage fallback)
     const q = new URLSearchParams(window.location.search);
     const qFrom = (q.get('from') || '').toUpperCase();
     const qTo = (q.get('to') || '').toUpperCase();
     const qNum = q.get('num') || '';
     const qTz = q.get('tz') || '';
 
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem(STATE_KEY) || 'null'); } catch {}
+
     // Defaults for a useful first impression.
-    $to.value = byIso2.has(qTo) ? qTo : 'US';
-    $from.value = byIso2.has(qFrom) ? qFrom : 'GB';
-    if (qNum) $num.value = qNum;
-    if (qTz) activeTzId = qTz;
+    const from = byIso2.has(qFrom) ? qFrom : (byIso2.has((stored?.from||'').toUpperCase()) ? (stored.from||'').toUpperCase() : 'GB');
+    const to = byIso2.has(qTo) ? qTo : (byIso2.has((stored?.to||'').toUpperCase()) ? (stored.to||'').toUpperCase() : 'US');
+    $from.value = from;
+    $to.value = to;
+
+    const initialNum = qNum || (stored?.num || '');
+    if (initialNum) $num.value = initialNum;
+
+    const initialTz = qTz || (stored?.tz || '');
+    if (initialTz) activeTzId = initialTz;
 
     update();
     syncUrl();
