@@ -52,7 +52,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <div class="heroActions">
         <a id="callLink" class="btn primary" href="#" aria-disabled="true">Call now</a>
         <button type="button" id="copyBtn">Copy</button>
-        <a class="small" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
+        <a class="small" id="advancedLink" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
       </div>
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
       <div id="altDial" class="small" style="margin-top: 6px;"></div>
@@ -419,6 +419,9 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     $to.addEventListener('change', update);
     $num.addEventListener('input', update);
 
+    const $brandHome = document.getElementById('brandHome');
+    const $advancedLink = document.getElementById('advancedLink');
+
     function syncUrl() {
       const url = new URL(window.location.href);
       url.searchParams.set('from', $from.value);
@@ -428,6 +431,16 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if (activeTzId) url.searchParams.set('tz', activeTzId);
       else url.searchParams.delete('tz');
       history.replaceState({}, '', url);
+
+      // Keep the logo/home link preserving state
+      if ($brandHome) $brandHome.href = `/?${url.searchParams.toString()}`;
+
+      // Keep the advanced builder link pre-filled
+      const adv = new URL('/dial-builder/', window.location.origin);
+      adv.searchParams.set('from', $from.value);
+      adv.searchParams.set('to', $to.value);
+      if ($num.value && $num.value.trim()) adv.searchParams.set('num', $num.value);
+      if ($advancedLink) $advancedLink.href = adv.pathname + '?' + adv.searchParams.toString();
     }
 
     // Restore from query params

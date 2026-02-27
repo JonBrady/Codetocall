@@ -233,8 +233,10 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const q = new URLSearchParams(window.location.search);
     const qFrom = (q.get('from') || '').toUpperCase();
     const qTo = (q.get('to') || '').toUpperCase();
+    const qNum = q.get('num') || '';
     if (byIso2.has(qFrom)) $from.value = qFrom;
     if (byIso2.has(qTo)) $to.value = qTo;
+    if (qNum) $num.value = qNum;
 
     // Sensible defaults for demo
     if (!qFrom) $from.value = 'GB';
