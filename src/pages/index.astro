@@ -4,7 +4,7 @@ import countries from '../data/countries.json';
 import exitCodes from '../data/exitCodes.json';
 
 const title = 'CodeToCall — Dial the right international number';
-const description = 'Calculator-first: enter a number and where you’re calling from, and get the exact dial string (tap-to-call on mobile, copy on desktop).';
+const description = 'Calculator-first: enter where you’re calling from, where you’re calling to, and the number — get the exact dial string (tap-to-call on mobile, copy on desktop).';
 
 const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 ---
@@ -12,15 +12,25 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 <Layout title={title} description={description}>
   <h1 style="margin: 22px 0 8px;">Dial the right international number</h1>
   <p class="small" style="max-width: 75ch;">
-    Paste a phone number in any format. We’ll normalize it and show the exact number to dial.
+    Choose a destination, then start typing the number. We’ll show the exact number to dial.
     On mobile you can tap to call; on desktop you can copy.
   </p>
 
   <div class="card" style="margin-top: 14px;">
     <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
       <div>
+        <label for="to">Calling to</label>
+        <select id="to" required>
+          {countryOptions.map((c) => (
+            <option value={c.iso2}>{c.name} ({c.iso2})</option>
+          ))}
+        </select>
+        <div class="small" style="margin-top: 8px;">Destination local time will show below.</div>
+      </div>
+
+      <div>
         <label for="from">Calling from</label>
-        <select id="from">
+        <select id="from" required>
           {countryOptions.map((c) => (
             <option value={c.iso2}>{c.name} ({c.iso2})</option>
           ))}
@@ -31,22 +41,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         <label for="num">Number to call</label>
         <input id="num" type="text" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
         <div class="small" style="margin-top: 8px;">
-          Tip: If you include <span class="kbd">+</span> and country code, we can detect the destination automatically.
-        </div>
-      </div>
-
-      <div id="destWrap" style="display:none; grid-column: 1 / -1;">
-        <div class="card" style="background: rgba(0,0,0,.015); box-shadow:none;">
-          <div class="small" style="margin-bottom: 10px;">
-            Not sure which country this number belongs to. Choose a destination (optional) to be precise.
-          </div>
-          <label for="to" style="margin-top:0;">Destination country (optional)</label>
-          <select id="to">
-            <option value="">— Choose destination —</option>
-            {countryOptions.map((c) => (
-              <option value={c.iso2}>{c.name} ({c.iso2})</option>
-            ))}
-          </select>
+          Tip: If you paste a number starting with <span class="kbd">+</span>, we’ll auto-detect the destination and update “Calling to”.
         </div>
       </div>
     </div>
@@ -108,9 +103,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const byIso2 = new Map(countries.map(c => [c.iso2, c]));
 
     const $from = document.getElementById('from');
-    const $num = document.getElementById('num');
-    const $destWrap = document.getElementById('destWrap');
     const $to = document.getElementById('to');
+    const $num = document.getElementById('num');
 
     const $heroNumber = document.getElementById('heroNumber');
     const $heroMeta = document.getElementById('heroMeta');
@@ -189,60 +183,29 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       $copyBtn.disabled = !canCall;
     }
 
-    function update() {
-      const origin = byIso2.get($from.value);
-      const raw = $num.value;
+    function normalizeForDestination(raw, destination) {
       const warnings = [];
-
-      if (!origin) {
-        setHero(null, '', ['Choose an origin country.'], null);
-        return;
-      }
-
       const raw0 = removeOptionalZeroMarker(raw);
       const stripped = stripFormatting(raw0);
 
-      // Case 1: user pasted an international number.
       if (stripped.startsWith('+')) {
         const digits = stripped.slice(1);
-        const dest = findCountryByCallingCodePrefix(digits);
-        if (!dest) {
-          setHero(`+${digits}`, 'International number (country code not recognized in the current dataset).', [
-            'We can’t identify the destination country from this +... number with the current dataset. The dial string is still shown as-is.',
-          ], null);
-          $destWrap.style.display = 'none';
-          $to.value = '';
-          return;
+        const c = findCountryByCallingCodePrefix(digits);
+        if (!c) {
+          warnings.push('This looks like an international number (+...), but the country code is not recognized in the current dataset.');
+          return { e164: `+${digits}`, nsn: null, warnings, detectedDestIso2: null };
         }
-
-        const nsn = digits.slice(dest.callingCode.length);
-        const e164 = `+${dest.callingCode}${nsn}`;
-        setHero(e164, `Detected destination: ${dest.name} (+${dest.callingCode})`, warnings, dest.iso2);
-        $destWrap.style.display = 'none';
-        $to.value = '';
-        return;
+        const nsn = digits.slice(c.callingCode.length);
+        return { e164: `+${c.callingCode}${nsn}`, nsn, warnings, detectedDestIso2: c.iso2 };
       }
 
-      // Case 2: national-format input (no +). We need a destination to be confident.
-      // Show inline destination picker (optional), without blocking.
-      $destWrap.style.display = '';
-
-      const toIso2 = ($to.value || '').toUpperCase();
-      const dest = toIso2 ? byIso2.get(toIso2) : null;
-
-      if (!stripped) {
-        setHero(null, '', ['Enter a phone number.'], null);
-        return;
-      }
-
-      if (!dest) {
-        setHero(null, 'Choose a destination to generate the exact international dial string.', warnings, null);
-        return;
-      }
-
-      // Destination selected: normalize as national number for that destination.
       let national = stripped;
-      const trunk = dest.trunkPrefix;
+      if (!national) {
+        warnings.push('Enter a phone number.');
+        return { e164: null, nsn: null, warnings, detectedDestIso2: null };
+      }
+
+      const trunk = destination.trunkPrefix;
       if (trunk && national.startsWith(trunk)) {
         national = national.slice(trunk.length);
         warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
@@ -250,8 +213,32 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
       }
 
-      const e164 = `+${dest.callingCode}${national}`;
-      setHero(e164, `Destination: ${dest.name} (+${dest.callingCode})`, warnings, dest.iso2);
+      return { e164: `+${destination.callingCode}${national}`, nsn: national, warnings, detectedDestIso2: null };
+    }
+
+    function update() {
+      const origin = byIso2.get($from.value);
+      const dest = byIso2.get($to.value);
+      const raw = $num.value;
+
+      if (!origin || !dest) {
+        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null);
+        return;
+      }
+
+      const { e164, warnings, detectedDestIso2 } = normalizeForDestination(raw, dest);
+
+      // If user pasted a + number and we can detect the destination, keep UI in sync.
+      if (detectedDestIso2 && byIso2.has(detectedDestIso2)) {
+        $to.value = detectedDestIso2;
+      }
+
+      const finalDest = byIso2.get($to.value);
+      const meta = finalDest
+        ? `Destination: ${finalDest.name} (+${finalDest.callingCode})`
+        : '';
+
+      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null);
     }
 
     async function copyText(text) {
@@ -268,12 +255,14 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
     }
 
-    $copyBtn.addEventListener('click', () => copyText($heroNumber.textContent));
-    $from.addEventListener('change', update);
-    $num.addEventListener('input', update);
-    $to.addEventListener('change', update);
+    document.getElementById('copyBtn').addEventListener('click', () => copyText($heroNumber.textContent));
 
-    // Defaults
+    $from.addEventListener('change', update);
+    $to.addEventListener('change', update);
+    $num.addEventListener('input', update);
+
+    // Defaults for a useful first impression.
+    $to.value = 'US';
     $from.value = 'GB';
     update();
   </script>
