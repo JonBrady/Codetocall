@@ -64,6 +64,11 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;margin-top:44px;background:#fff}
 
+/* Time band */
+.band{margin:18px 0 10px; padding:14px 16px; background:#f0f0f0; border:1px solid var(--borderSoft); border-left:4px solid var(--b)}
+.bandTitle{font-weight:900; letter-spacing:.01em}
+.bandText{margin-top:2px}
+
 /* Tiles (Time.is-inspired layout, but our own styling) */
 .tileRow{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px}
 .tile{display:block;min-width:140px;flex:0 0 auto;padding:10px 14px;border-radius:0;border:1px solid var(--borderSoft);background:#f1f1f1;color:var(--text);text-decoration:none}

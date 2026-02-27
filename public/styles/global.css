@@ -78,6 +78,11 @@ footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;
   .tile{min-width:120px;flex:1 1 120px}
 }
 
+/* Time band */
+.band{margin:18px 0 10px; padding:14px 16px; background:#f0f0f0; border:1px solid var(--borderSoft); border-left:4px solid var(--b)}
+.bandTitle{font-weight:900; letter-spacing:.01em}
+.bandText{margin-top:2px}
+
 /* Ad placeholders (no ad scripts). Remove/hide later by setting display:none. */
 .adSlot{border:1px dashed var(--adBorder);background:var(--adBg);border-radius:8px;padding:10px 12px;color:var(--muted)}
 .adSlot .adLabel{font-size:.85rem;letter-spacing:.06em;text-transform:uppercase}

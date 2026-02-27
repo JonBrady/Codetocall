@@ -60,6 +60,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     </div>
   </div>
 
+  <div id="timeBand" class="band" aria-label="Destination local time" style="display:none;">
+    <div class="bandTitle">Local time at destination</div>
+    <div id="timeBandText" class="bandText small"></div>
+  </div>
+
   <div class="adSlot adTop" aria-label="Advertisement placeholder">
     <div class="adLabel">Advertisement</div>
     <div class="adMeta">Top slot (e.g., 728×90 desktop / 320×100 mobile)</div>
@@ -114,6 +119,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
     const $destTime = document.getElementById('destTime');
+    const $timeBand = document.getElementById('timeBand');
+    const $timeBandText = document.getElementById('timeBandText');
 
     const timeZonesByIso2 = {
       GB: 'Europe/London',
@@ -165,7 +172,17 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       $heroMeta.textContent = meta || '';
 
       const t = destIso2 ? formatLocalTime(destIso2) : null;
+      const dest = destIso2 ? byIso2.get(destIso2) : null;
+
       $destTime.textContent = t ? `Local time there: ${t}` : '';
+
+      if (t && dest) {
+        $timeBand.style.display = '';
+        $timeBandText.textContent = `${dest.name}: ${t}`;
+      } else {
+        $timeBand.style.display = 'none';
+        $timeBandText.textContent = '';
+      }
 
       $warnings.innerHTML = (warnings && warnings.length)
         ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
