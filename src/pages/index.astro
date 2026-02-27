@@ -1,39 +1,248 @@
 ---
 import Layout from '../components/Layout.astro';
 import countries from '../data/countries.json';
+import exitCodes from '../data/exitCodes.json';
 
-const title = 'International Country Calling Codes + Dial Builder';
-const description = 'Fast, static pages for every country calling code, plus a dial builder that generates the exact dial string (+E.164 and legacy exit-code formats).';
+const title = 'CodeToCall — Dial the right international number';
+const description = 'Calculator-first: enter a number and where you’re calling from, and get the exact dial string (tap-to-call on mobile, copy on desktop).';
 
-const sorted = [...countries].sort((a, b) => a.name.localeCompare(b.name));
+const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name));
 ---
 
 <Layout title={title} description={description}>
-  <h1 style="margin: 22px 0 8px;">International calling codes, done for real-world dialing</h1>
-  <p class="small" style="max-width: 70ch;">
-    Most sites stop at “country code is X”. This one answers the actual question: <strong>what do I dial?</strong>
-    Use the <a href="/dial-builder/">Dial Builder</a> to normalize messy numbers and generate the exact dial string.
+  <h1 style="margin: 22px 0 8px;">Dial the right international number</h1>
+  <p class="small" style="max-width: 75ch;">
+    Paste a phone number in any format. We’ll normalize it and show the exact number to dial.
+    On mobile you can tap to call; on desktop you can copy.
   </p>
 
-  <div class="grid" style="margin-top: 18px;">
-    <div class="card">
-      <h2 style="margin-top:0">Dial Builder</h2>
-      <p class="small">Pick “calling from”, “calling to”, paste any phone number — get:</p>
-      <ul>
-        <li>Mobile-friendly: <span class="kbd">+&#123;countryCode&#125;&#123;nationalNumber&#125;</span></li>
-        <li>Legacy: <span class="kbd">&#123;exitCode&#125; &#123;countryCode&#125; &#123;nationalNumber&#125;</span></li>
-      </ul>
-      <a href="/dial-builder/">Open Dial Builder →</a>
+  <div class="card" style="margin-top: 14px;">
+    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+      <div>
+        <label for="from">Calling from</label>
+        <select id="from">
+          {countryOptions.map((c) => (
+            <option value={c.iso2}>{c.name} ({c.iso2})</option>
+          ))}
+        </select>
+      </div>
+
+      <div style="grid-column: 1 / -1;">
+        <label for="num">Number to call</label>
+        <input id="num" type="text" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
+        <div class="small" style="margin-top: 8px;">
+          Tip: If you include <span class="kbd">+</span> and country code, we can detect the destination automatically.
+        </div>
+      </div>
+
+      <div id="destWrap" style="display:none; grid-column: 1 / -1;">
+        <div class="card" style="background: rgba(0,0,0,.015); box-shadow:none;">
+          <div class="small" style="margin-bottom: 10px;">
+            Not sure which country this number belongs to. Choose a destination (optional) to be precise.
+          </div>
+          <label for="to" style="margin-top:0;">Destination country (optional)</label>
+          <select id="to">
+            <option value="">— Choose destination —</option>
+            {countryOptions.map((c) => (
+              <option value={c.iso2}>{c.name} ({c.iso2})</option>
+            ))}
+          </select>
+        </div>
+      </div>
     </div>
 
+    <div style="margin-top: 14px;" class="hero">
+      <div class="small">Dial this</div>
+      <div id="heroNumber" class="heroNumber">—</div>
+      <div class="heroActions">
+        <a id="callLink" class="btn primary" href="#" aria-disabled="true">Call now</a>
+        <button type="button" id="copyBtn">Copy</button>
+        <a class="small" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
+      </div>
+      <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
+      <div id="warnings" class="small" style="margin-top: 10px;"></div>
+    </div>
+  </div>
+
+  <div class="adSlot adTop" aria-label="Advertisement placeholder">
+    <div class="adLabel">Advertisement</div>
+    <div class="adMeta">Top slot (e.g., 728×90 desktop / 320×100 mobile)</div>
+  </div>
+
+  <div class="grid" style="margin-top: 16px;">
     <div class="card">
-      <h2 style="margin-top:0">Country calling codes (starter set)</h2>
-      <p class="small">MVP dataset is 10 countries to start. We’ll expand safely + validate as we go.</p>
-      <ul>
-        {sorted.map((c) => (
-          <li><a href={`/country/${c.iso2.toLowerCase()}/`}>{c.name}</a> <span class="small">(+{c.callingCode})</span></li>
+      <h2 style="margin-top:0">Popular destinations</h2>
+      <p class="small">Quick links (starter set). We’ll expand safely.</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+        {countryOptions.slice(0, 10).map((c) => (
+          <a class="kbd" href={`/country/${c.iso2.toLowerCase()}/`}>{c.name} (+{c.callingCode})</a>
         ))}
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">What you’ll get</h2>
+      <ul>
+        <li><strong>Tap-to-call</strong> link on mobile</li>
+        <li><strong>Copy</strong> button that works on desktop</li>
+        <li>Normalized formats (E.164 when possible)</li>
       </ul>
     </div>
   </div>
+
+  <div class="adSlot adMid" aria-label="Advertisement placeholder">
+    <div class="adLabel">Advertisement</div>
+    <div class="adMeta">Mid slot (e.g., responsive rectangle)</div>
+  </div>
+
+  <div class="adSlot adBottom" aria-label="Advertisement placeholder">
+    <div class="adLabel">Advertisement</div>
+    <div class="adMeta">Bottom slot (e.g., footer anchor / wide unit)</div>
+  </div>
+
+  <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
+  <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
+
+  <script>
+    const countries = JSON.parse(document.getElementById('data-countries').textContent);
+    const byIso2 = new Map(countries.map(c => [c.iso2, c]));
+
+    const $from = document.getElementById('from');
+    const $num = document.getElementById('num');
+    const $destWrap = document.getElementById('destWrap');
+    const $to = document.getElementById('to');
+
+    const $heroNumber = document.getElementById('heroNumber');
+    const $heroMeta = document.getElementById('heroMeta');
+    const $warnings = document.getElementById('warnings');
+    const $copyBtn = document.getElementById('copyBtn');
+    const $callLink = document.getElementById('callLink');
+
+    function stripFormatting(input) {
+      const trimmed = (input || '').trim();
+      const hasPlus = trimmed.startsWith('+');
+      const digitsOnly = trimmed.replace(/[^0-9]/g, '');
+      return hasPlus ? `+${digitsOnly}` : digitsOnly;
+    }
+
+    function removeOptionalZeroMarker(input) {
+      return (input || '').replace(/\(0\)/g, '');
+    }
+
+    function findCountryByCallingCodePrefix(digits) {
+      const matches = countries
+        .filter(c => digits.startsWith(c.callingCode))
+        .sort((a, b) => b.callingCode.length - a.callingCode.length);
+      return matches[0];
+    }
+
+    function setHero(e164, meta, warnings) {
+      $heroNumber.textContent = e164 || '—';
+      $heroMeta.textContent = meta || '';
+
+      $warnings.innerHTML = (warnings && warnings.length)
+        ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
+        : '';
+
+      const canCall = !!e164 && e164 !== '—';
+      if (canCall) {
+        $callLink.href = `tel:${e164}`;
+        $callLink.setAttribute('aria-disabled', 'false');
+        $callLink.classList.remove('disabled');
+      } else {
+        $callLink.href = '#';
+        $callLink.setAttribute('aria-disabled', 'true');
+        $callLink.classList.add('disabled');
+      }
+
+      $copyBtn.disabled = !canCall;
+    }
+
+    function update() {
+      const origin = byIso2.get($from.value);
+      const raw = $num.value;
+      const warnings = [];
+
+      if (!origin) {
+        setHero(null, '', ['Choose an origin country.']);
+        return;
+      }
+
+      const raw0 = removeOptionalZeroMarker(raw);
+      const stripped = stripFormatting(raw0);
+
+      // Case 1: user pasted an international number.
+      if (stripped.startsWith('+')) {
+        const digits = stripped.slice(1);
+        const dest = findCountryByCallingCodePrefix(digits);
+        if (!dest) {
+          setHero(`+${digits}`, 'International number (country code not recognized in the current dataset).', [
+            'We can’t identify the destination country from this +... number with the current dataset. The dial string is still shown as-is.',
+          ]);
+          $destWrap.style.display = 'none';
+          $to.value = '';
+          return;
+        }
+
+        const nsn = digits.slice(dest.callingCode.length);
+        const e164 = `+${dest.callingCode}${nsn}`;
+        setHero(e164, `Detected destination: ${dest.name} (+${dest.callingCode})`, warnings);
+        $destWrap.style.display = 'none';
+        $to.value = '';
+        return;
+      }
+
+      // Case 2: national-format input (no +). We need a destination to be confident.
+      // Show inline destination picker (optional), without blocking.
+      $destWrap.style.display = '';
+
+      const toIso2 = ($to.value || '').toUpperCase();
+      const dest = toIso2 ? byIso2.get(toIso2) : null;
+
+      if (!stripped) {
+        setHero(null, '', ['Enter a phone number.']);
+        return;
+      }
+
+      if (!dest) {
+        setHero(null, 'Choose a destination to generate the exact international dial string.', warnings);
+        return;
+      }
+
+      // Destination selected: normalize as national number for that destination.
+      let national = stripped;
+      const trunk = dest.trunkPrefix;
+      if (trunk && national.startsWith(trunk)) {
+        national = national.slice(trunk.length);
+        warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
+      } else if (trunk && /^(0)+/.test(national)) {
+        warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
+      }
+
+      const e164 = `+${dest.callingCode}${national}`;
+      setHero(e164, `Destination: ${dest.name} (+${dest.callingCode})`, warnings);
+    }
+
+    async function copyText(text) {
+      if (!text || text === '—') return;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+    }
+
+    $copyBtn.addEventListener('click', () => copyText($heroNumber.textContent));
+    $from.addEventListener('change', update);
+    $num.addEventListener('input', update);
+    $to.addEventListener('change', update);
+
+    // Defaults
+    $from.value = 'GB';
+    update();
+  </script>
 </Layout>

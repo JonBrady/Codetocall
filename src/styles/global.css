@@ -1,31 +1,61 @@
 :root{
-  --bg:#0b0f19;
-  --panel:#111a2c;
-  --text:#e9eefb;
-  --muted:#b7c2dd;
-  --link:#8ab4ff;
-  --border:rgba(255,255,255,.12);
-  --max:1000px;
+  /* Time.is-inspired: clean, light, utility-first */
+  --bg:#ffffff;
+  --panel:#ffffff;
+  --text:#111111;
+  --muted:#555555;
+  --link:#0b57d0;
+  --border:rgba(0,0,0,.14);
+  --borderSoft:rgba(0,0,0,.08);
+  --shadow:0 1px 2px rgba(0,0,0,.06);
+  --max:900px;
 }
+
+/* Optional dark mode later; keep light as default for the Time.is feel. */
+
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.5}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.45}
 a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
-.container{max-width:var(--max);margin:0 auto;padding:24px}
-header.site{border-bottom:1px solid var(--border);background:rgba(0,0,0,.15);backdrop-filter:saturate(160%) blur(8px)}
-header .row{display:flex;align-items:center;justify-content:space-between;gap:16px}
-nav a{margin-left:12px;color:var(--muted)}
+
+.container{max-width:var(--max);margin:0 auto;padding:28px 18px}
+
+header.site{border-bottom:1px solid var(--borderSoft);background:var(--bg)}
+header .row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0}
+nav a{margin-left:14px;color:var(--muted)}
 nav a:hover{color:var(--text)}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+
+.card{background:var(--panel);border:1px solid var(--borderSoft);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 .small{color:var(--muted);font-size:.95rem}
-.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.95em;background:rgba(255,255,255,.06);border:1px solid var(--border);padding:2px 6px;border-radius:8px}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.95em;background:rgba(0,0,0,.03);border:1px solid var(--borderSoft);padding:2px 6px;border-radius:8px}
+
 input,select,button,textarea{font:inherit}
-label{display:block;margin:10px 0 6px}
-input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text)}
-button{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer}
-button:hover{background:rgba(255,255,255,.1)}
+label{display:block;margin:10px 0 6px;font-weight:600}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+input::placeholder{color:#8a8a8a}
+button{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer}
+button:hover{background:rgba(0,0,0,.03)}
+button:disabled{opacity:.55;cursor:not-allowed}
+
+/* Hero */
+.hero{padding-top:2px}
+.heroNumber{font-size: clamp(44px, 7vw, 78px); font-weight: 800; letter-spacing: .01em; margin-top: 6px; line-height: 1.02}
+.heroActions{display:flex; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
+.btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--border); background: #fff; color: var(--text)}
+.btn:hover{background:rgba(0,0,0,.03); text-decoration:none}
+.btn.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn.primary:hover{opacity:.9}
+.btn.disabled{opacity:.55; pointer-events:none}
+
 .outputs{display:grid;gap:10px;margin-top:12px}
 .outputRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .outputRow code{flex:1;min-width:220px}
-footer{border-top:1px solid var(--border);color:var(--muted);padding:28px 0;margin-top:40px}
+
+footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;margin-top:44px;background:#fff}
+
+/* Responsive polish */
+@media (max-width: 520px){
+  header .row{flex-direction:column;align-items:flex-start}
+  nav a{margin-left:0;margin-right:14px}
+}

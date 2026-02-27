@@ -24,8 +24,8 @@ const url = canonical ?? Astro.url;
       <div class="container">
         <div class="row">
           <div>
-            <a href="/" style="font-weight:700; color: var(--text);">DialCode</a>
-            <div class="small">International calling codes + dial builder</div>
+            <a href="/" style="font-weight:800; color: var(--text); letter-spacing: .01em;">CodeToCall</a>
+            <div class="small">International dialing, made simple</div>
           </div>
           <nav>
             <a href="/dial-builder/">Dial Builder</a>
@@ -42,7 +42,7 @@ const url = canonical ?? Astro.url;
     <footer>
       <div class="container">
         <div class="small">
-          Static-first (no per-click servers). Data is versioned in the repo. This is an MVP — country rules will improve over time.
+          © {new Date().getFullYear()} CodeToCall · International dialing helper · <a href="/about-data/">Data & methodology</a>
         </div>
       </div>
     </footer>
