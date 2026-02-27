@@ -29,6 +29,13 @@ header .row{display:flex;align-items:flex-start;justify-content:space-between;ga
 nav a{margin-left:14px;color:var(--muted)}
 nav a:hover{color:var(--text)}
 
+/* Wordmark */
+.brand{font-weight:900; letter-spacing:.01em; font-size: 18px; line-height:1; color:var(--text)}
+.brand:hover{text-decoration:none}
+.brandCode{color:var(--b)}
+.brandTo{color:var(--muted); font-weight:600}
+.brandCall{color:var(--b)}
+
 .card{background:var(--panel);border:1px solid var(--borderSoft);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 .small{color:var(--muted);font-size:.95rem}
