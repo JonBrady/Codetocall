@@ -94,7 +94,7 @@
     },
     "notes": [
       "Italy is special: the leading 0 of many fixed-line numbers is often dialed even from abroad.",
-      "This MVP does not attempt to model Italy’s full fixed/mobile rules — we keep normalization simple and show warnings when a leading 0 is present."
+      "Italy has nuanced fixed/mobile rules. We keep normalization simple for now and show warnings when a leading 0 is present."
     ]
   },
   {
