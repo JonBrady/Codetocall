@@ -55,6 +55,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         <a class="small" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
       </div>
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
+      <div id="altDial" class="small" style="margin-top: 6px;"></div>
       <div id="destTime" class="small" style="margin-top: 6px;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
     </div>
@@ -107,6 +108,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
   <script>
     const countries = JSON.parse(document.getElementById('data-countries').textContent);
+    const exitCodes = JSON.parse(document.getElementById('data-exit').textContent);
     const byIso2 = new Map(countries.map(c => [c.iso2, c]));
 
     const $from = document.getElementById('from');
@@ -118,6 +120,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $warnings = document.getElementById('warnings');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
+    const $altDial = document.getElementById('altDial');
     const $destTime = document.getElementById('destTime');
     const $timeBand = document.getElementById('timeBand');
     const $timeBandText = document.getElementById('timeBandText');
@@ -167,9 +170,10 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       return matches[0];
     }
 
-    function setHero(e164, meta, warnings, destIso2) {
+    function setHero(e164, meta, warnings, destIso2, altDialText) {
       $heroNumber.textContent = e164 || '—';
       $heroMeta.textContent = meta || '';
+      $altDial.textContent = altDialText || '';
 
       const t = destIso2 ? formatLocalTime(destIso2) : null;
       const dest = destIso2 ? byIso2.get(destIso2) : null;
@@ -250,11 +254,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       setTileSelection(dest ? dest.iso2 : null);
 
       if (!origin || !dest) {
-        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null);
+        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null, '');
         return;
       }
 
-      const { e164, warnings, detectedDestIso2 } = normalizeForDestination(raw, dest);
+      const { e164, nsn, warnings, detectedDestIso2 } = normalizeForDestination(raw, dest);
 
       // If user pasted a + number and we can detect the destination, keep UI in sync.
       if (detectedDestIso2 && byIso2.has(detectedDestIso2)) {
@@ -262,11 +266,20 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
 
       const finalDest = byIso2.get($to.value);
+
+      // Build a “landline / older phone” dial string using the origin exit code (IDD prefix), if available.
+      const exit = exitCodes[origin.iso2];
+      const legacy = exit && nsn && finalDest ? `${exit} ${finalDest.callingCode} ${nsn}` : null;
+
+      const alt = legacy
+        ? `If you can’t dial “+”, try: ${legacy}`
+        : 'On most mobiles, you can dial the number exactly as shown (with “+”).';
+
       const meta = finalDest
-        ? `Destination: ${finalDest.name} (+${finalDest.callingCode})`
+        ? `Destination: ${finalDest.name} (+${finalDest.callingCode})${exit ? ` · Exit code from ${origin.iso2}: ${exit}` : ''}`
         : '';
 
-      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null);
+      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt);
     }
 
     async function copyText(text) {
