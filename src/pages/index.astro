@@ -38,7 +38,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       </div>
 
       <div style="grid-column: 1 / -1;">
-        <label for="num">Number to call</label>
+        <label for="num">Please enter the number you want to call</label>
         <input id="num" type="text" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
         <div class="small" style="margin-top: 8px;">
           Tip: If you paste a number starting with <span class="kbd">+</span>, we’ll auto-detect the destination and update “Calling to”.
@@ -57,8 +57,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
       <div id="altDial" class="small" style="margin-top: 6px;"></div>
       <div id="localDial" class="small" style="margin-top: 6px;"></div>
-      <div id="destTime" class="small" style="margin-top: 6px;"></div>
-      <div id="tzWrap" class="small" style="margin-top: 6px; display:none;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
     </div>
   </div>
@@ -66,6 +64,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
   <div id="timeBand" class="band" aria-label="Destination local time" style="display:none;">
     <div class="bandTitle">Local time at destination</div>
     <div id="timeBandText" class="bandText small"></div>
+    <div id="tzWrap" class="bandText small" style="margin-top:6px; display:none;"></div>
   </div>
 
   <div class="adSlot adTop" aria-label="Advertisement placeholder">
@@ -124,7 +123,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $callLink = document.getElementById('callLink');
     const $altDial = document.getElementById('altDial');
     const $localDial = document.getElementById('localDial');
-    const $destTime = document.getElementById('destTime');
     const $timeBand = document.getElementById('timeBand');
     const $timeBandText = document.getElementById('timeBandText');
     const $tzWrap = document.getElementById('tzWrap');
@@ -184,7 +182,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         const t = formatLocalTime(activeTzId);
         const dest = byIso2.get(activeDestIso2);
         if (!t || !dest) return;
-        $destTime.textContent = `Local time there: ${t}`;
         $timeBand.style.display = '';
         $timeBandText.textContent = `${dest.name}: ${t}`;
       }, 60_000);
@@ -230,7 +227,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
 
       const t = formatLocalTime(activeTzId);
-      $destTime.textContent = t ? `Local time there: ${t}` : '';
 
       if (t) {
         $timeBand.style.display = '';
@@ -377,11 +373,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         localLine = `Calling within ${finalDest.name}? You may be able to dial locally as: ${local}`;
       }
 
-      // Transparency: we format numbers, but do not validate existence.
-      warnings.push('Note: CodeToCall formats numbers, but can’t verify whether a number is active.');
-
       const meta = finalDest
-        ? `Destination: ${finalDest.name} (+${finalDest.callingCode})${exit ? ` · Exit code from ${origin.iso2}: ${exit}` : ''}`
+        ? `Destination: ${finalDest.name} (+${finalDest.callingCode})`
         : '';
 
       setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt, localLine);
