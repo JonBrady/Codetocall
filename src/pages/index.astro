@@ -68,7 +68,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
   <div class="grid" style="margin-top: 16px;">
     <div class="card">
       <h2 style="margin-top:0">Popular destinations</h2>
-      <p class="small">Quick links (starter set). We’ll expand safely.</p>
       <div class="tileRow" aria-label="Popular destinations">
         {countryOptions.slice(0, 10).map((c) => (
           <a class="tile" href={`/country/${c.iso2.toLowerCase()}/`}>
@@ -79,11 +78,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       </div>
     </div>
     <div class="card">
-      <h2 style="margin-top:0">What you’ll get</h2>
+      <h2 style="margin-top:0">Dialing tips</h2>
       <ul>
-        <li><strong>Tap-to-call</strong> link on mobile</li>
-        <li><strong>Copy</strong> button that works on desktop</li>
-        <li>Normalized formats (E.164 when possible)</li>
+        <li>If the number starts with <span class="kbd">+</span>, you can usually dial it exactly as shown.</li>
+        <li>If it starts with <span class="kbd">0</span>, you may need to drop the leading <span class="kbd">0</span> when calling internationally.</li>
+        <li>Not sure? Use <a href="/dial-builder/">Advanced builder</a> for exit-code formats.</li>
       </ul>
     </div>
   </div>
