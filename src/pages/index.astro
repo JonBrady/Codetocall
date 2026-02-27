@@ -56,6 +56,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       </div>
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
       <div id="altDial" class="small" style="margin-top: 6px;"></div>
+      <div id="localDial" class="small" style="margin-top: 6px;"></div>
       <div id="destTime" class="small" style="margin-top: 6px;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
     </div>
@@ -121,6 +122,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
     const $altDial = document.getElementById('altDial');
+    const $localDial = document.getElementById('localDial');
     const $destTime = document.getElementById('destTime');
     const $timeBand = document.getElementById('timeBand');
     const $timeBandText = document.getElementById('timeBandText');
@@ -170,10 +172,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       return matches[0];
     }
 
-    function setHero(e164, meta, warnings, destIso2, altDialText) {
+    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText) {
       $heroNumber.textContent = e164 || '—';
       $heroMeta.textContent = meta || '';
       $altDial.textContent = altDialText || '';
+      $localDial.textContent = localDialText || '';
 
       const t = destIso2 ? formatLocalTime(destIso2) : null;
       const dest = destIso2 ? byIso2.get(destIso2) : null;
@@ -210,6 +213,15 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       const warnings = [];
       const raw0 = removeOptionalZeroMarker(raw);
       const stripped = stripFormatting(raw0);
+
+      // Basic sanity checks (formatting only; we cannot verify if a number is active)
+      const digitsForLen = stripped.startsWith('+') ? stripped.slice(1) : stripped;
+      if (digitsForLen && digitsForLen.length < 6) {
+        warnings.push('This looks very short for a phone number. Double-check you’ve entered the full number (including area code).');
+      }
+      if (digitsForLen && digitsForLen.length > 15) {
+        warnings.push('This looks very long for a phone number. Double-check for extra digits.');
+      }
 
       if (stripped.startsWith('+')) {
         const digits = stripped.slice(1);
@@ -254,7 +266,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       setTileSelection(dest ? dest.iso2 : null);
 
       if (!origin || !dest) {
-        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null, '');
+        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null, '', '');
         return;
       }
 
@@ -275,11 +287,23 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         ? `If you can’t dial “+”, try: ${legacy}`
         : 'On most mobiles, you can dial the number exactly as shown (with “+”).';
 
+      // Same-country hint
+      const isInternationalInput = stripFormatting(removeOptionalZeroMarker(raw)).startsWith('+');
+      let localLine = '';
+      if (origin.iso2 === finalDest?.iso2 && nsn && !isInternationalInput) {
+        const trunk = finalDest.trunkPrefix;
+        const local = trunk ? `${trunk}${nsn}` : nsn;
+        localLine = `Calling within ${finalDest.name}? You may be able to dial locally as: ${local}`;
+      }
+
+      // Transparency: we format numbers, but do not validate existence.
+      warnings.push('Note: CodeToCall formats numbers, but can’t verify whether a number is active.');
+
       const meta = finalDest
         ? `Destination: ${finalDest.name} (+${finalDest.callingCode})${exit ? ` · Exit code from ${origin.iso2}: ${exit}` : ''}`
         : '';
 
-      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt);
+      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt, localLine);
     }
 
     async function copyText(text) {
