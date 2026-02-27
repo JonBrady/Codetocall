@@ -39,8 +39,9 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <div style="grid-column: 1 / -1;">
         <label for="num">Phone number</label>
         <input id="num" type="text" placeholder="e.g. 07911 123 456, (0)20 7123 4567, +33 (0)1 44 55 66 77" />
-        <div class="small" style="margin-top: 8px;">
-          Tip: You can link to this page pre-filled using query params like <span class="kbd">?from=GB&to=FR</span>
+        <div class="small" style="margin-top: 8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <span>Tip: You can share a link that opens with countries pre-selected.</span>
+          <button type="button" id="copyShareLink">Copy share link</button>
         </div>
       </div>
     </div>
@@ -91,6 +92,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $outE164 = document.getElementById('outE164');
     const $outLegacy = document.getElementById('outLegacy');
     const $warnings = document.getElementById('warnings');
+    const $copyShareLink = document.getElementById('copyShareLink');
 
     function stripFormatting(input) {
       const trimmed = (input || '').trim();
@@ -188,7 +190,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
     }
 
-    async function copyWithFeedback(btn, text) {
+    async function copyButtonFeedback(btn, text) {
       const t = (text || '').trim();
       if (!t || t === '—') return;
       await copyText(t);
@@ -203,10 +205,25 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }, 1200);
     }
 
+    async function copyWithFeedback(btn, text) {
+      return copyButtonFeedback(btn, text);
+    }
+
     const $copyE164 = document.getElementById('copyE164');
     const $copyLegacy = document.getElementById('copyLegacy');
     $copyE164.addEventListener('click', () => copyWithFeedback($copyE164, $outE164.textContent));
     $copyLegacy.addEventListener('click', () => copyWithFeedback($copyLegacy, $outLegacy.textContent));
+
+    $copyShareLink.addEventListener('click', () => {
+      const origin = byIso2.get($from.value);
+      const dest = byIso2.get($to.value);
+      if (!origin || !dest) return;
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('from', origin.iso2);
+      url.searchParams.set('to', dest.iso2);
+      copyButtonFeedback($copyShareLink, url.toString());
+    });
 
     $from.addEventListener('change', update);
     $to.addEventListener('change', update);
