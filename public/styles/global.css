@@ -21,7 +21,7 @@
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.45}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Montserrat,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;line-height:1.45}
 a{color:var(--link);text-decoration:none}
 a:hover{text-decoration:underline}
 
@@ -48,7 +48,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 /* Hero */
 .hero{padding-top:2px}
-.heroNumber{font-family:"Archivo Black", Inter, system-ui, sans-serif; font-size: clamp(42px, 7vw, 84px); font-weight: 400; letter-spacing: .01em; margin-top: 8px; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word; color:#333}
+.heroNumber{font-family:Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); font-weight: 900; letter-spacing: .005em; margin-top: 8px; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word; color:#333}
 .heroActions{display:flex; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
 .btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--borderSoft); background: #fff; color: var(--text)}
 .btn:hover{background:rgba(0,0,0,.03); text-decoration:none}

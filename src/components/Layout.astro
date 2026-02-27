@@ -19,7 +19,9 @@ const url = canonical ?? Astro.url;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Archivo+Black&display=swap" rel="stylesheet" />
+    <!-- Time.is uses Montserrat for most text, and a custom clock font (TimeTraveler) for the big digits.
+         We can match the feel with Montserrat + a heavy Montserrat weight for the hero number. -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
     <link rel="stylesheet" href="/styles/global.css" />
   </head>
