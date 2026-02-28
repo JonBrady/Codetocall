@@ -54,8 +54,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         <div id="heroHint" class="heroHint" aria-hidden="true">
           <div class="heroHintInner">
             <div class="heroHintTrack">
-              <span>Paste the number you want to call above — or type it in the box above.</span>
-              <span aria-hidden="true">Paste the number you want to call above — or type it in the box above.</span>
+              <span>Enter the number you want to call in the text box above.</span>
+              <span aria-hidden="true">Enter the number you want to call in the text box above.</span>
             </div>
           </div>
         </div>
@@ -269,7 +269,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     }
 
     function setHero(e164, meta, warnings, destIso2, altDialText, localDialText) {
-      $heroNumber.textContent = e164 || '—';
+      $heroNumber.textContent = e164 || '';
       $heroMeta.textContent = meta || '';
       $altDial.textContent = altDialText || '';
       $localDial.textContent = localDialText || '';
@@ -280,7 +280,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
         : '';
 
-      const canCall = !!e164 && e164 !== '—';
+      const canCall = !!e164;
       if (canCall) {
         $callLink.href = `tel:${e164}`;
         $callLink.setAttribute('aria-disabled', 'false');
