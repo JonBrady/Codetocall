@@ -68,7 +68,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 /* Hero hint marquee (shows only when no number entered) */
 .heroHint{position:absolute; inset:0; display:none; align-items:center; pointer-events:none}
 .heroHintInner{width:100%; overflow:hidden; padding-top: 10px}
-.heroHintTrack{display:flex; gap:56px; white-space:nowrap; color:rgba(0,0,0,.38); font-weight:700; letter-spacing:.01em; font-size: clamp(16px, 2.4vw, 26px); animation: heroMarquee 12s linear infinite}
+.heroHintTrack{display:flex; gap:56px; white-space:nowrap; color:rgba(0,0,0,.38); font-weight:900; letter-spacing:.005em; font-family: Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); line-height: 1.02; animation: heroMarquee 12s linear infinite}
 .heroHintTrack span{display:inline-block}
 @keyframes heroMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 @media (prefers-reduced-motion: reduce){.heroHintTrack{animation:none}}
