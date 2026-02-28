@@ -341,8 +341,13 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if (trunk && national.startsWith(trunk)) {
         national = national.slice(trunk.length);
         warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
-      } else if (trunk && /^(0)+/.test(national)) {
-        warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
+      } else if (!trunk && /^0+/.test(national)) {
+        // Heuristic: most countries use a leading 0 as a national trunk prefix.
+        // When building an international E.164 number, drop it.
+        national = national.replace(/^0+/, '');
+        warnings.push('Dropped leading 0 trunk prefix for international dialing.');
+      } else if (!trunk && /^00/.test(national)) {
+        warnings.push('This number starts with 00 (an international dialing prefix). Consider pasting the number with a leading + instead.');
       }
 
       return { e164: `+${destination.callingCode}${national}`, nsn: national, warnings, detectedDestIso2: null };
