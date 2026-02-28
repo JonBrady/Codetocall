@@ -74,12 +74,19 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <h2 style="margin-top:0">Popular destinations</h2>
       <p class="small" style="margin-top:-6px;">Or browse by calling code: try <a href="/calling-code/1/">+1</a>, <a href="/calling-code/44/">+44</a>, <a href="/calling-code/61/">+61</a>.</p>
       <div class="tileRow" aria-label="Popular destinations">
-        {countryOptions.slice(0, 10).map((c) => (
-          <a class="tile" data-iso2={c.iso2} href={`/country/${c.iso2.toLowerCase()}/`}>
-            <div class="tileTitle">{c.name}</div>
-            <div class="tileSub">+{c.callingCode}</div>
-          </a>
-        ))}
+        {(() => {
+          const POPULAR = ['US','FR','ES','DE','IE','IT','NL','AU','IN','PK'];
+          const picked = POPULAR
+            .map((iso2) => countryOptions.find((c) => c.iso2 === iso2))
+            .filter(Boolean);
+
+          return picked.map((c) => (
+            <a class="tile" data-iso2={c.iso2} href={`/country/${c.iso2.toLowerCase()}/`}>
+              <div class="tileTitle">{c.name}</div>
+              <div class="tileSub">+{c.callingCode}</div>
+            </a>
+          ));
+        })()}
       </div>
     </div>
     <div class="card">
