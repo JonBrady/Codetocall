@@ -1,0 +1,41 @@
+---
+import Layout from '../../components/Layout.astro';
+import countries from '../../data/countries.generated.json';
+
+const code = Astro.params.code ?? '';
+
+const codeDigits = String(code).replace(/[^0-9]/g, '');
+
+export function getStaticPaths() {
+  const codes = Array.from(new Set(countries.map((c) => c.callingCode)));
+  return codes.map((cc) => ({ params: { code: cc } }));
+}
+
+const matches = countries.filter((c) => c.callingCode === codeDigits);
+if (!matches.length) {
+  throw new Error(`Unknown calling code: ${codeDigits}`);
+}
+
+const title = `Country calling code +${codeDigits} — countries and how to dial`;
+const description = `Which country uses calling code +${codeDigits}? See all countries/territories that share +${codeDigits}, plus links to dial instructions and the dial builder.`;
+---
+
+<Layout title={title} description={description}>
+  <h1 style="margin: 22px 0 6px;">Calling code <span class="kbd">+{codeDigits}</span></h1>
+  <p class="small">Countries and territories that use <span class="kbd">+{codeDigits}</span>:</p>
+
+  <div class="card" style="margin-top: 14px;">
+    <ul>
+      {matches.map((c) => (
+        <li>
+          <a href={`/country/${c.iso2.toLowerCase()}/`}>{c.name}</a>
+          <span class="small"> ({c.iso2})</span>
+        </li>
+      ))}
+    </ul>
+
+    <p style="margin-top: 14px;">
+      Use the <a href={`/dial-builder/?to=${matches[0].iso2}`}>Dial Builder</a> to generate an exact dial string.
+    </p>
+  </div>
+</Layout>

@@ -2,7 +2,16 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const root = process.cwd();
-const countriesPath = path.join(root, 'src', 'data', 'countries.json');
+const countriesPath = await (async () => {
+  const gen = path.join(root, 'src', 'data', 'countries.generated.json');
+  const legacy = path.join(root, 'src', 'data', 'countries.json');
+  try {
+    await fs.access(gen);
+    return gen;
+  } catch {
+    return legacy;
+  }
+})();
 const exitCodesPath = path.join(root, 'src', 'data', 'exitCodes.json');
 
 function die(msg) {

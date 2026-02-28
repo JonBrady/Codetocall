@@ -1,0 +1,32 @@
+---
+const {
+  name,
+  minHeight = 120,
+  minWidth,
+}: {
+  name: string;
+  minHeight?: number;
+  minWidth?: number;
+} = Astro.props;
+
+const ADS_ENABLED = import.meta.env.PUBLIC_ADS_ENABLED === 'true';
+---
+
+<div
+  class="adSlot"
+  data-slot={name}
+  style={{
+    minHeight: `${minHeight}px`,
+    ...(minWidth ? { minWidth: `${minWidth}px` } : {}),
+  }}
+>
+  {ADS_ENABLED ? (
+    <div class="adSlotInner">
+      {/* Replace this block with ad network tags when ready */}
+    </div>
+  ) : (
+    <div class="adSlotInner adSlotPlaceholder">
+      <span>Ad slot: {name}</span>
+    </div>
+  )}
+</div>

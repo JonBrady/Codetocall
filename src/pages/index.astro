@@ -1,6 +1,6 @@
 ---
 import Layout from '../components/Layout.astro';
-import countries from '../data/countries.json';
+import countries from '../data/countries.generated.json';
 import exitCodes from '../data/exitCodes.json';
 
 const title = 'CodeToCall — International dialing made simple';
@@ -11,6 +11,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
 <Layout title={title} description={description}>
   <h1 style="margin: 22px 0 8px;">Dial the right international number</h1>
+  <p class="small" style="margin-top:-2px;">Covering <strong>{countries.length}</strong> countries/territories.</p>
   <p class="small" style="max-width: 75ch;">
     Choose a destination, then start typing the number. We’ll show the exact number to dial.
     On mobile you can tap to call; on desktop you can copy.
@@ -67,14 +68,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     <div id="tzWrap" class="bandText small" style="margin-top:6px; display:none;"></div>
   </div>
 
-  <div class="adSlot adTop" aria-label="Advertisement placeholder">
-    <div class="adLabel">Advertisement</div>
-    <div class="adMeta">Top slot (e.g., 728×90 desktop / 320×100 mobile)</div>
-  </div>
 
   <div class="grid" style="margin-top: 16px;">
     <div class="card">
       <h2 style="margin-top:0">Popular destinations</h2>
+      <p class="small" style="margin-top:-6px;">Or browse by calling code: try <a href="/calling-code/1/">+1</a>, <a href="/calling-code/44/">+44</a>, <a href="/calling-code/61/">+61</a>.</p>
       <div class="tileRow" aria-label="Popular destinations">
         {countryOptions.slice(0, 10).map((c) => (
           <a class="tile" data-iso2={c.iso2} href={`/country/${c.iso2.toLowerCase()}/`}>
@@ -94,15 +92,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     </div>
   </div>
 
-  <div class="adSlot adMid" aria-label="Advertisement placeholder">
-    <div class="adLabel">Advertisement</div>
-    <div class="adMeta">Mid slot (e.g., responsive rectangle)</div>
-  </div>
-
-  <div class="adSlot adBottom" aria-label="Advertisement placeholder">
-    <div class="adLabel">Advertisement</div>
-    <div class="adMeta">Bottom slot (e.g., footer anchor / wide unit)</div>
-  </div>
 
   <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
   <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
