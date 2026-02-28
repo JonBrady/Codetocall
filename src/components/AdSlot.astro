@@ -1,4 +1,6 @@
 ---
+import { ADSENSE_ENABLED, ADSENSE_MODE, ADS_RENDER } from '../lib/adsense';
+
 const {
   name,
   minHeight = 120,
@@ -9,9 +11,12 @@ const {
   minWidth?: number;
 } = Astro.props;
 
-import { ADSENSE_ENABLED, ADSENSE_MODE } from '../lib/adsense';
+const ADS_ENABLED = ADSENSE_ENABLED && ADS_RENDER;
 
-const ADS_ENABLED = ADSENSE_ENABLED;
+// If ads aren't meant to render yet, return nothing (no placeholder box, no reserved space).
+if (!ADS_ENABLED) {
+  return null;
+}
 ---
 
 <div
@@ -22,25 +27,18 @@ const ADS_ENABLED = ADSENSE_ENABLED;
     ...(minWidth ? { minWidth: `${minWidth}px` } : {}),
   }}
 >
-  {ADS_ENABLED ? (
-    <div class="adSlotInner">
-      {/* Google AdSense placeholder: fill in data-ad-slot values when available. */}
-      <ins
-        class="adsbygoogle"
-        style="display:block"
-        data-ad-client={import.meta.env.PUBLIC_ADSENSE_CLIENT}
-        data-ad-slot={import.meta.env[`PUBLIC_ADSENSE_SLOT_${name.toUpperCase()}`]}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-        data-npa={ADSENSE_MODE === 'non-personalized' ? '1' : undefined}
-      ></ins>
-      <script>
-        {`(adsbygoogle = window.adsbygoogle || []).push({});`}
-      </script>
-    </div>
-  ) : (
-    <div class="adSlotInner adSlotPlaceholder">
-      <span>Ad slot: {name}</span>
-    </div>
-  )}
+  <div class="adSlotInner">
+    <ins
+      class="adsbygoogle"
+      style="display:block"
+      data-ad-client={import.meta.env.PUBLIC_ADSENSE_CLIENT}
+      data-ad-slot={import.meta.env[`PUBLIC_ADSENSE_SLOT_${name.toUpperCase()}`]}
+      data-ad-format="auto"
+      data-full-width-responsive="true"
+      data-npa={ADSENSE_MODE === 'non-personalized' ? '1' : undefined}
+    ></ins>
+    <script>
+      {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+    </script>
+  </div>
 </div>
