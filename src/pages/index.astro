@@ -49,7 +49,17 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
     <div style="margin-top: 14px;" class="hero">
       <div class="small">Dial this</div>
-      <div id="heroNumber" class="heroNumber">—</div>
+      <div class="heroNumberWrap">
+        <div id="heroNumber" class="heroNumber">—</div>
+        <div id="heroHint" class="heroHint" aria-hidden="true">
+          <div class="heroHintInner">
+            <div class="heroHintTrack">
+              <span>Paste the number you want to call above — or type it in the box above.</span>
+              <span aria-hidden="true">Paste the number you want to call above — or type it in the box above.</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="heroActions">
         <a id="callLink" class="btn primary" href="#" aria-disabled="true">Call now</a>
         <button type="button" id="copyBtn">Copy</button>
@@ -115,6 +125,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $heroNumber = document.getElementById('heroNumber');
     const $heroMeta = document.getElementById('heroMeta');
     const $warnings = document.getElementById('warnings');
+    const $heroHint = document.getElementById('heroHint');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
     const $altDial = document.getElementById('altDial');
@@ -281,6 +292,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
 
       $copyBtn.disabled = !canCall;
+
+      // Show a subtle marquee hint when nothing has been entered yet.
+      if ($heroHint) {
+        $heroHint.style.display = canCall ? 'none' : 'flex';
+        $heroHint.setAttribute('aria-hidden', canCall ? 'true' : 'false');
+      }
     }
 
     function normalizeForDestination(raw, destination) {
