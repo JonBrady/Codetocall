@@ -62,18 +62,19 @@ button:disabled{opacity:.55;cursor:not-allowed}
 
 /* Hero */
 .hero{padding-top:2px}
-.heroNumberWrap{position:relative}
-.heroNumber{font-family:Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); font-weight: 900; letter-spacing: .005em; margin-top: 8px; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word; color:#333}
+.heroNumberWrap{position:relative; margin-top: 8px; min-height: clamp(44px, 7vw, 90px)}
+.heroNumber{font-family:Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); font-weight: 900; letter-spacing: .005em; line-height: 1.02; max-width: 100%; overflow-wrap:anywhere; word-break:break-word; color:#333}
 
 /* Hero hint marquee (shows only when no number entered) */
-.heroHint{position:absolute; inset:0; display:none; align-items:center; pointer-events:none}
-.heroHintInner{width:100%; overflow:hidden; padding-top: 10px}
+.heroHint{position:absolute; inset:0; display:none; align-items:center; pointer-events:none; z-index:0}
+.heroHintInner{width:100%; overflow:hidden}
 .heroNumber:empty{opacity:0}
-.heroHintTrack{display:flex; width:max-content; white-space:nowrap; color:rgba(0,0,0,.38); font-weight:900; letter-spacing:.005em; font-family: Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); line-height: 1.02; animation: heroMarquee 8s linear infinite}
+.heroHintTrack{display:flex; width:max-content; white-space:nowrap; color:rgba(0,0,0,.38); font-weight:900; letter-spacing:.005em; font-family: Montserrat, system-ui, sans-serif; font-size: clamp(44px, 7vw, 90px); line-height: 1.02; animation: heroMarquee 6s linear infinite; will-change: transform; transform: translate3d(0,0,0)}
 .heroHintTrack span{display:inline-block; padding-right:56px}
-@keyframes heroMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes heroMarquee{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-50%,0,0)}}
 @media (prefers-reduced-motion: reduce){.heroHintTrack{animation:none}}
-.heroActions{display:flex; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
+.heroActions{display:none; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
+.hero.hasNumber .heroActions{display:flex}
 .btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--borderSoft); background: #fff; color: var(--text)}
 .btn:hover{background:rgba(0,0,0,.03); text-decoration:none}
 .btn.primary{background:var(--b);color:#fff;border-color:var(--b)}

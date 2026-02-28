@@ -47,7 +47,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       </div>
     </div>
 
-    <div style="margin-top: 14px;" class="hero">
+    <div style="margin-top: 14px;" class="hero" id="hero">
       <div class="small">Dial this</div>
       <div class="heroNumberWrap">
         <div id="heroNumber" class="heroNumber">—</div>
@@ -126,6 +126,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $heroMeta = document.getElementById('heroMeta');
     const $warnings = document.getElementById('warnings');
     const $heroHint = document.getElementById('heroHint');
+    const $hero = document.getElementById('hero');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
     const $altDial = document.getElementById('altDial');
@@ -297,6 +298,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if ($heroHint) {
         $heroHint.style.display = canCall ? 'none' : 'flex';
         $heroHint.setAttribute('aria-hidden', canCall ? 'true' : 'false');
+      }
+
+      // Hide buttons until there is a valid number (prevents overlap + makes the hero calmer).
+      if ($hero) {
+        $hero.classList.toggle('hasNumber', canCall);
       }
     }
 
