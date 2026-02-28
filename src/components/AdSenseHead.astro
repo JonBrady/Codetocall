@@ -1,0 +1,11 @@
+---
+import { ADSENSE_CLIENT, ADSENSE_ENABLED, getAdsenseScriptSrc } from '../lib/adsense';
+
+if (!ADSENSE_ENABLED || !ADSENSE_CLIENT) {
+  // render nothing
+}
+---
+
+{(ADSENSE_ENABLED && ADSENSE_CLIENT) ? (
+  <script async src={getAdsenseScriptSrc()} crossorigin="anonymous"></script>
+) : null}
