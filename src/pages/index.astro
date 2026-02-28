@@ -66,6 +66,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         <a class="small" id="advancedLink" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
       </div>
       <div id="heroMeta" class="small" style="margin-top: 10px;"></div>
+      <div id="heroContext" class="small" style="margin-top: 4px;"></div>
       <div id="altDial" class="small" style="margin-top: 6px;"></div>
       <div id="localDial" class="small" style="margin-top: 6px;"></div>
       <div id="warnings" class="small" style="margin-top: 10px;"></div>
@@ -133,6 +134,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $warnings = document.getElementById('warnings');
     const $heroHint = document.getElementById('heroHint');
     const $hero = document.getElementById('hero');
+    const $heroContext = document.getElementById('heroContext');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
     const $altDial = document.getElementById('altDial');
@@ -275,7 +277,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       startTicker();
     }
 
-    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText) {
+    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText, contextText) {
       $heroNumber.textContent = e164 || '';
       $heroMeta.textContent = meta || '';
       $altDial.textContent = altDialText || '';
@@ -286,6 +288,10 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       $warnings.innerHTML = (warnings && warnings.length)
         ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
         : '';
+
+      if ($heroContext) {
+        $heroContext.textContent = contextText || '';
+      }
 
       const canCall = !!e164;
       if (canCall) {
@@ -388,7 +394,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       setTileSelection(dest ? dest.iso2 : null);
 
       if (!origin || !dest) {
-        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null, '', '');
+        setHero(null, '', ['Choose both “calling to” and “calling from”.'], null, '', '', '');
         return;
       }
 
@@ -424,7 +430,11 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         ? `Destination: ${finalDest.name} (+${finalDest.callingCode})`
         : '';
 
-      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt, localLine);
+      const contextText = (raw && raw.trim() && !stripFormatting(removeOptionalZeroMarker(raw)).startsWith('+'))
+        ? `Interpreting as a ${finalDest.name} national number.`
+        : '';
+
+      setHero(e164, meta, warnings, finalDest ? finalDest.iso2 : null, alt, localLine, contextText);
     }
 
     async function copyText(text) {
