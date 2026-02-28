@@ -84,13 +84,14 @@ button:disabled{opacity:.55;cursor:not-allowed}
 @media (prefers-reduced-motion: reduce){.heroHintTrack{animation:none}}
 .heroActions{display:none; gap:10px; align-items:center; margin-top: 10px; flex-wrap:wrap}
 .hero.hasNumber .heroActions{display:flex}
-.btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--borderSoft); background: #fff; color: var(--text)}
-.btn:hover{background:rgba(0,0,0,.03); text-decoration:none}
+.btn{display:inline-block; padding:10px 12px; border-radius:10px; border:1px solid var(--borderSoft); background: rgba(255,255,255,.9); color: var(--text); backdrop-filter: blur(6px)}
+.btn:hover{background:rgba(255,255,255,1); text-decoration:none}
 .btn.primary{background:var(--b);color:#fff;border-color:var(--b)}
 .btn.adv{background:var(--g); color:#fff; border-color: var(--g)}
 .btn.adv:hover{opacity:.92}
 .btn.primary:hover{opacity:.9}
 .btn.disabled{opacity:.55; pointer-events:none}
+.btnRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
 
 /* Copy feedback */
 .btn.success, button.success{background:var(--g);border-color:var(--g);color:#fff}

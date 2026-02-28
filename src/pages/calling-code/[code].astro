@@ -21,7 +21,12 @@ const description = `Which country uses calling code +${codeDigits}? See all cou
 ---
 
 <Layout title={title} description={description}>
-  <h1 style="margin: 22px 0 6px;">Calling code <span class="kbd">+{codeDigits}</span></h1>
+  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 22px 0 6px; flex-wrap:wrap;">
+    <a class="btn" href="/" aria-label="Back to homepage">← Back to home</a>
+    <a class="btn" href="/dial-builder/" aria-label="Open dial builder">Dial Builder →</a>
+  </div>
+
+  <h1 style="margin: 10px 0 6px;">Calling code <span class="kbd">+{codeDigits}</span></h1>
   <p class="small">Countries and territories that use <span class="kbd">+{codeDigits}</span>:</p>
 
   <div class="card" style="margin-top: 14px;">
