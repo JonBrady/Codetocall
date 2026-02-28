@@ -40,7 +40,7 @@ const url = canonical ?? Astro.url;
          We can match the feel with Montserrat + a heavy Montserrat weight for the hero number. -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="/styles/global.css?v=20260228-2218" />
+    <link rel="stylesheet" href="/styles/global.css?v=20260228-2229" />
 
     <AdSenseHead />
 
@@ -90,6 +90,10 @@ const url = canonical ?? Astro.url;
       <div class="container">
         <div style="margin: 0 0 18px;">
           <AdSlot name="bottom" minHeight={110} />
+        </div>
+        <div class="btnRow footerNav" style="margin: 0 0 12px;">
+          <a class="btn footerBtn" href="/" aria-label="Back to homepage">← Home</a>
+          <a class="btn footerBtn" href="/dial-builder/" aria-label="Open dial builder">Dial Builder</a>
         </div>
         <div class="small">
           © {new Date().getFullYear()} CodeToCall · International dialing helper ·

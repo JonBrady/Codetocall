@@ -92,6 +92,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .btn.primary:hover{opacity:.9}
 .btn.disabled{opacity:.55; pointer-events:none}
 .btnRow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.footerNav{justify-content:flex-start}
+.footerBtn{padding:9px 12px; font-weight:800; border-radius:999px}
 
 /* Copy feedback */
 .btn.success, button.success{background:var(--g);border-color:var(--g);color:#fff}
