@@ -113,6 +113,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
   <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
   <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
 
+  <!-- libphonenumber-js (client-side) for correct E.164 formatting when user types national numbers -->
+  <script type="module">
+    import { parsePhoneNumberFromString } from 'libphonenumber-js';
+    window.libphonenumber = { parsePhoneNumberFromString };
+  </script>
+
   <script>
     const countries = JSON.parse(document.getElementById('data-countries').textContent);
     const exitCodes = JSON.parse(document.getElementById('data-exit').textContent);
@@ -310,6 +316,20 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       const warnings = [];
       const raw0 = removeOptionalZeroMarker(raw);
       const stripped = stripFormatting(raw0);
+
+      // If we have a destination context and the user did NOT paste a + number,
+      // try to parse/format with libphonenumber for correct trunk-prefix handling.
+      // This prevents bugs like +440... when dialing UK mobiles.
+      try {
+        if (destination?.iso2 && stripped && !stripped.startsWith('+') && window.libphonenumber?.parsePhoneNumberFromString) {
+          const pn = window.libphonenumber.parsePhoneNumberFromString(stripped, destination.iso2);
+          if (pn && pn.isValid && pn.isValid()) {
+            return { e164: pn.number, nsn: pn.nationalNumber, warnings, detectedDestIso2: null };
+          }
+        }
+      } catch {
+        // fall through to heuristic logic
+      }
 
       // Basic sanity checks (formatting only; we cannot verify if a number is active)
       const digitsForLen = stripped.startsWith('+') ? stripped.slice(1) : stripped;
