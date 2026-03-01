@@ -2,6 +2,7 @@
 import Layout from '../../components/Layout.astro';
 import countries from '../../data/countries.generated.json';
 import exitCodes from '../../data/exitCodes.json';
+import countryGuides from '../../data/countryGuides.json';
 
 const iso2 = Astro.params.iso2?.toUpperCase() ?? '';
 const country = countries.find((c) => c.iso2 === iso2);
@@ -20,6 +21,8 @@ const description = `How to call ${country.name} from abroad: what to dial, trun
 const topOrigins = ['US', 'GB', 'CA', 'IE', 'FR', 'DE', 'ES', 'IT', 'AU', 'IN']
   .filter((x) => x !== country.iso2);
 
+const guide = countryGuides[country.iso2];
+
 const faqs = [
   {
     q: `What is the country calling code for ${country.name}?`,
@@ -34,7 +37,9 @@ const faqs = [
     a: country.trunkPrefix
       ? `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`
       : `${country.name} does not have a trunk prefix listed in the dataset right now, but formatting varies; use the dial builder to normalize your specific number.`,
-  }
+  },
+  // Country-specific FAQs (hand-curated, stored in src/data/countryGuides.json)
+  ...(guide?.faqs ?? []).map((f) => ({ q: f.q, a: f.a })),
 ];
 
 const faqJsonLd = {
@@ -54,6 +59,39 @@ const faqJsonLd = {
     The short answer is <span class="kbd">+{country.callingCode}</span>. The useful answer is: <strong>what do you dial</strong> from your country, and what should you do with leading zeros?
   </p>
 
+
+  {guide ? (
+    <div class="card" style="margin-top: 14px;">
+      <h2 style="margin-top:0">Dialling notes for {country.name}</h2>
+      <p class="small">{guide.intro}</p>
+
+      {guide.tips?.length ? (
+        <div>
+          <h3>Tips</h3>
+          <ul>
+            {guide.tips.map((t) => (
+              <li class="small">{t}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {guide.commonMistakes?.length ? (
+        <div>
+          <h3>Common mistakes</h3>
+          <ul>
+            {guide.commonMistakes.map((m) => (
+              <li class="small">{m}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      <p class="small" style="margin-top: 10px;">
+        See also: <a href={`/calling-code/${country.callingCode}/`}>calling code +{country.callingCode}</a>
+      </p>
+    </div>
+  ) : null}
 
   <div class="grid" style="margin-top: 14px;">
     <div class="card">

@@ -1,0 +1,54 @@
+{
+  "GB": {
+    "intro": "The UK uses the +44 calling code. UK numbers are often written with a leading 0 domestically (the trunk prefix). When calling the UK from abroad, you typically drop that leading 0 and dial +44 instead.",
+    "tips": [
+      "Domestic UK format often starts with 0 (e.g. 020…, 07…). International format typically removes that 0.",
+      "UK mobile numbers usually start with 07 domestically; from abroad that becomes +44 7…",
+      "If you’re calling from a mobile, using +44 is the simplest option (no need to know your exit code)."
+    ],
+    "commonMistakes": [
+      "Dialling +44 0… (keeping the domestic 0 after +44) — this often fails.",
+      "Mixing spaces/punctuation into a tel: link instead of a clean E.164 number."
+    ],
+    "faqs": [
+      {
+        "q": "Do I drop the leading 0 when calling the UK internationally?",
+        "a": "Usually yes. The leading 0 is a domestic trunk prefix and is typically omitted when dialling from abroad."
+      }
+    ]
+  },
+  "US": {
+    "intro": "The United States uses calling code +1 (NANP). +1 is shared across multiple countries/territories, so the area code is essential for identifying the destination.",
+    "tips": [
+      "US numbers are commonly written as (AAA) BBB-CCCC. In international/E.164 format this becomes +1AAABBBCCCC.",
+      "+1 is shared (NANP). If you only have “+1 …” without context, you can’t always infer the country/territory.",
+      "For click-to-call links, prefer tel:+1… without spaces for maximum compatibility."
+    ],
+    "commonMistakes": [
+      "Assuming +1 always means the USA (it can also be Canada and other NANP regions).",
+      "Dropping the area code (required for most calls)."
+    ],
+    "faqs": [
+      {
+        "q": "Is +1 always the United States?",
+        "a": "No. +1 is part of the North American Numbering Plan and is shared by multiple countries and territories (including Canada and others)."
+      }
+    ]
+  },
+  "FR": {
+    "intro": "France uses calling code +33. French numbers are usually written domestically with a leading 0; when calling from abroad, you generally drop that 0 and use +33.",
+    "tips": [
+      "Domestic numbers often look like 0X XX XX XX XX. International format commonly becomes +33 X XX XX XX XX.",
+      "Using +33 on mobiles is usually the easiest approach (no exit code needed)."
+    ],
+    "commonMistakes": [
+      "Dialling +33 0… (keeping the domestic 0 after +33)."
+    ],
+    "faqs": [
+      {
+        "q": "Do French numbers start with 0?",
+        "a": "Domestically, yes — the leading 0 is common. Internationally, you typically drop it and dial +33 instead."
+      }
+    ]
+  }
+}

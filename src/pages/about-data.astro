@@ -6,32 +6,44 @@ const description = 'How CodeToCall formats international numbers, what data is 
 ---
 
 <Layout title={title} description={description}>
-  <h1 style="margin: 22px 0 6px;">About the data</h1>
+  <h1 style="margin: 22px 0 6px;">About CodeToCall</h1>
 
   <div class="card" style="margin-top: 14px;">
     <p class="small">
-      CodeToCall uses a curated, versioned dataset (stored as JSON) so the site stays fast, cheap to run, and consistent.
+      CodeToCall is a small, fast tool that helps you format international phone numbers and understand calling codes.
+      It’s designed to be straightforward, reliable, and easy to use.
     </p>
 
-    <h2>What’s included</h2>
+    <h2>Where the data comes from</h2>
+    <p class="small">
+      We use a curated, versioned dataset (stored as JSON) so results are quick and consistent.
+      The dataset includes:
+    </p>
     <ul>
-      <li>Country name + ISO2 code</li>
-      <li>Country calling code (digits only)</li>
-      <li>Trunk prefix (if commonly used)</li>
-      <li>Example formats + simple notes</li>
-      <li>Origin exit codes (IDD prefix) for legacy formatting</li>
+      <li>Country name and ISO country code</li>
+      <li>Country calling code</li>
+      <li>Common trunk prefix (where applicable)</li>
+      <li>Example formats with short notes</li>
+      <li>International dialling / exit codes (IDD prefixes) used in some regions</li>
     </ul>
 
     <h2>Limitations</h2>
     <ul>
-      <li>This is a dialing helper, not a perfect global phone-number authority.</li>
-      <li>Some countries have nuanced rules that require special-casing.</li>
-      <li>Some calling codes are shared (e.g., NANP +1), so destination detection can be ambiguous.</li>
+      <li>CodeToCall is a dialing helper — not a definitive global phone-number authority.</li>
+      <li>Numbering rules vary by country and can be more complex than a simple pattern.</li>
+      <li>Some calling codes are shared (for example, +1 covers multiple regions), which can make destination detection ambiguous.</li>
+      <li>Carrier- and number-type differences (mobile vs landline) can require special handling.</li>
     </ul>
 
     <h2>Quality checks</h2>
     <p class="small">
-      We run automated checks on the dataset so updates don’t accidentally break formatting.
+      We run automated checks to catch obvious issues before updates go live. Changes are versioned so results stay stable over time.
+    </p>
+
+    <h2>Contact</h2>
+    <p class="small">
+      For questions, corrections, or partnership requests: <a href="mailto:dusty.opsdesk@gmail.com">dusty.opsdesk@gmail.com</a><br />
+      We don’t offer phone support — this is a small, static project.
     </p>
   </div>
 </Layout>
