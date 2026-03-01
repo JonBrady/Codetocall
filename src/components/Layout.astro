@@ -1,6 +1,7 @@
 ---
 import AdSlot from './AdSlot.astro';
 import AdSenseHead from './AdSenseHead.astro';
+import { ADS_RENDER } from '../lib/adsense';
 
 const { title, description, canonical } = Astro.props;
 const url = canonical ?? Astro.url;
@@ -40,7 +41,7 @@ const url = canonical ?? Astro.url;
          We can match the feel with Montserrat + a heavy Montserrat weight for the hero number. -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="/styles/global.css?v=20260228-2241" />
+    <link rel="stylesheet" href="/styles/global.css?v=20260301-0043" />
 
     <AdSenseHead />
 
@@ -74,23 +75,29 @@ const url = canonical ?? Astro.url;
 
     <main class="container">
       {/* Top ad slot */}
-      <div style="margin: 14px 0 18px;">
-        <AdSlot name="top" minHeight={110} />
-      </div>
+      {ADS_RENDER ? (
+        <div style="margin: 14px 0 18px;">
+          <AdSlot name="top" minHeight={110} />
+        </div>
+      ) : null}
 
       <slot />
 
       {/* Mid ad slot */}
-      <div style="margin: 22px 0 10px;">
-        <AdSlot name="mid" minHeight={280} />
-      </div>
+      {ADS_RENDER ? (
+        <div style="margin: 22px 0 10px;">
+          <AdSlot name="mid" minHeight={280} />
+        </div>
+      ) : null}
     </main>
 
     <footer>
       <div class="container">
-        <div style="margin: 0 0 18px;">
-          <AdSlot name="bottom" minHeight={110} />
-        </div>
+        {ADS_RENDER ? (
+          <div style="margin: 0 0 18px;">
+            <AdSlot name="bottom" minHeight={110} />
+          </div>
+        ) : null}
         <div class="btnRow footerNav" style="margin: 0 0 12px;">
           <a class="btn footerBtn" href="/" aria-label="Back to homepage">← Home</a>
           <a class="btn footerBtn" href="/dial-builder/" aria-label="Open dial builder">Dial Builder</a>
