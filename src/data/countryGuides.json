@@ -6,6 +6,10 @@
       "alternatives": ["112"],
       "notes": "999 and 112 both connect to the UK emergency services."
     },
+    "nonEmergencyNumbers": {
+      "medical": "111",
+      "notes": "111 is the NHS non-emergency medical number (UK)."
+    },
     "tips": [
       "Domestic UK format often starts with 0 (e.g. 020…, 07…). International format typically removes that 0.",
       "UK mobile numbers usually start with 07 domestically; from abroad that becomes +44 7…",
