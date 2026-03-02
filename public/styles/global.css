@@ -126,6 +126,11 @@ footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;
   .tile{min-width:120px;flex:1 1 120px}
 }
 
+/* Emergency / callout */
+.emergencyBox{background:rgba(217,48,37,.08); border:1px solid rgba(217,48,37,.35); border-left:6px solid var(--r)}
+.emergencyLabel{font-weight:900; letter-spacing:.04em; text-transform:uppercase; color:var(--r)}
+.emergencyNumber{display:inline-block; font-weight:900; font-size:1.35rem; color:var(--r); background:rgba(217,48,37,.10); border:1px solid rgba(217,48,37,.35); padding:3px 10px; border-radius:999px}
+
 /* Time band */
 .band{margin:18px 0 10px; padding:14px 16px; background:#f0f0f0; border:1px solid var(--borderSoft); border-left:4px solid var(--b)}
 .bandTitle{font-weight:900; letter-spacing:.01em}

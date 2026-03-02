@@ -66,24 +66,33 @@ const faqJsonLd = {
       <p class="small">{guide.intro}</p>
 
       {guide.emergencyNumbers ? (
-        <div>
-          <h3>Emergency numbers</h3>
-          <ul>
-            <li class="small"><strong>Emergency:</strong> {guide.emergencyNumbers.primary}{guide.emergencyNumbers.alternatives?.length ? ` (also ${guide.emergencyNumbers.alternatives.join(', ')})` : ''}</li>
-            {guide.emergencyNumbers.byService?.medical ? (
-              <li class="small"><strong>Medical:</strong> {guide.emergencyNumbers.byService.medical}</li>
+        <div class="card emergencyBox" style="margin-top: 12px;">
+          <div class="emergencyLabel">Emergency numbers</div>
+          <div style="margin-top: 6px;">
+            <span class="emergencyNumber">{guide.emergencyNumbers.primary}</span>
+            {guide.emergencyNumbers.alternatives?.length ? (
+              <span class="small" style="margin-left: 10px;">Also: {guide.emergencyNumbers.alternatives.join(', ')}</span>
             ) : null}
-            {guide.emergencyNumbers.byService?.police ? (
-              <li class="small"><strong>Police:</strong> {guide.emergencyNumbers.byService.police}</li>
-            ) : null}
-            {guide.emergencyNumbers.byService?.fire ? (
-              <li class="small"><strong>Fire:</strong> {guide.emergencyNumbers.byService.fire}</li>
-            ) : null}
-          </ul>
-          {guide.emergencyNumbers.notes ? (
-            <p class="small">{guide.emergencyNumbers.notes}</p>
+          </div>
+
+          {guide.emergencyNumbers.byService?.medical || guide.emergencyNumbers.byService?.police || guide.emergencyNumbers.byService?.fire ? (
+            <ul style="margin: 10px 0 0; padding-left: 18px;">
+              {guide.emergencyNumbers.byService?.medical ? (
+                <li class="small"><strong>Medical:</strong> {guide.emergencyNumbers.byService.medical}</li>
+              ) : null}
+              {guide.emergencyNumbers.byService?.police ? (
+                <li class="small"><strong>Police:</strong> {guide.emergencyNumbers.byService.police}</li>
+              ) : null}
+              {guide.emergencyNumbers.byService?.fire ? (
+                <li class="small"><strong>Fire:</strong> {guide.emergencyNumbers.byService.fire}</li>
+              ) : null}
+            </ul>
           ) : null}
-          <p class="small">Emergency numbers can vary by region/provider — if you’re travelling, check locally when possible.</p>
+
+          {guide.emergencyNumbers.notes ? (
+            <p class="small" style="margin-top: 10px;">{guide.emergencyNumbers.notes}</p>
+          ) : null}
+          <p class="small" style="margin-bottom: 0;">Emergency numbers can vary by region/provider — if you’re travelling, check locally when possible.</p>
         </div>
       ) : null}
 
