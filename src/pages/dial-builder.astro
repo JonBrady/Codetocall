@@ -7,6 +7,31 @@ const title = 'Dial Builder — generate the exact international number to dial'
 const description = 'Pick calling-from and calling-to countries, paste a phone number, and copy the exact international dial string.';
 
 const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name));
+
+const faqs = [
+  {
+    q: 'What does the “+” mean in a phone number?',
+    a: 'The “+” means “use my country\'s international access code automatically”. On mobiles, + is the most universal way to write an international number (E.164).',
+  },
+  {
+    q: 'Do I keep the leading 0 when calling internationally?',
+    a: 'Often no. In many countries the leading 0 is a domestic trunk prefix and is usually dropped when you dial internationally. This tool will warn you and (when configured) drop the trunk prefix for the destination country.',
+  },
+  {
+    q: 'What\'s the difference between the mobile-friendly and legacy formats?',
+    a: 'Mobile-friendly uses +E.164 (e.g. +44...). Legacy uses your exit code (IDD prefix) + country calling code + national number (e.g. 011 44 ...).',
+  },
+];
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
 ---
 
 <Layout title={title} description={description}>
@@ -94,6 +119,18 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       Otherwise we treat it as a national number for the destination and (when configured) drop the trunk prefix.
     </p>
   </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h2 style="margin-top:0">FAQ</h2>
+    {faqs.map((f) => (
+      <details style="margin: 10px 0;">
+        <summary><strong>{f.q}</strong></summary>
+        <p class="small">{f.a}</p>
+      </details>
+    ))}
+  </div>
+
+  <script type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
 
   <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
   <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
