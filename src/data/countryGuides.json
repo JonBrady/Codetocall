@@ -1,6 +1,11 @@
 {
   "GB": {
     "intro": "The UK uses the +44 calling code. UK numbers are often written with a leading 0 domestically (the trunk prefix). When calling the UK from abroad, you typically drop that leading 0 and dial +44 instead.",
+    "emergencyNumbers": {
+      "primary": "999",
+      "alternatives": ["112"],
+      "notes": "999 and 112 both connect to the UK emergency services."
+    },
     "tips": [
       "Domestic UK format often starts with 0 (e.g. 020…, 07…). International format typically removes that 0.",
       "UK mobile numbers usually start with 07 domestically; from abroad that becomes +44 7…",
@@ -19,6 +24,10 @@
   },
   "US": {
     "intro": "The United States uses calling code +1 (NANP). +1 is shared across multiple countries/territories, so the area code is essential for identifying the destination.",
+    "emergencyNumbers": {
+      "primary": "911",
+      "notes": "911 is the standard emergency number in the United States."
+    },
     "tips": [
       "US numbers are commonly written as (AAA) BBB-CCCC. In international/E.164 format this becomes +1AAABBBCCCC.",
       "+1 is shared (NANP). If you only have “+1 …” without context, you can’t always infer the country/territory.",
@@ -37,6 +46,15 @@
   },
   "FR": {
     "intro": "France uses calling code +33. French numbers are usually written domestically with a leading 0; when calling from abroad, you generally drop that 0 and use +33.",
+    "emergencyNumbers": {
+      "primary": "112",
+      "byService": {
+        "medical": "15",
+        "police": "17",
+        "fire": "18"
+      },
+      "notes": "112 is the EU-wide emergency number; France also uses 15 (medical), 17 (police), and 18 (fire)."
+    },
     "tips": [
       "Domestic numbers often look like 0X XX XX XX XX. International format commonly becomes +33 X XX XX XX XX.",
       "Using +33 on mobiles is usually the easiest approach (no exit code needed)."

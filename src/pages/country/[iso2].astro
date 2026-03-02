@@ -65,6 +65,28 @@ const faqJsonLd = {
       <h2 style="margin-top:0">Dialling notes for {country.name}</h2>
       <p class="small">{guide.intro}</p>
 
+      {guide.emergencyNumbers ? (
+        <div>
+          <h3>Emergency numbers</h3>
+          <ul>
+            <li class="small"><strong>Emergency:</strong> {guide.emergencyNumbers.primary}{guide.emergencyNumbers.alternatives?.length ? ` (also ${guide.emergencyNumbers.alternatives.join(', ')})` : ''}</li>
+            {guide.emergencyNumbers.byService?.medical ? (
+              <li class="small"><strong>Medical:</strong> {guide.emergencyNumbers.byService.medical}</li>
+            ) : null}
+            {guide.emergencyNumbers.byService?.police ? (
+              <li class="small"><strong>Police:</strong> {guide.emergencyNumbers.byService.police}</li>
+            ) : null}
+            {guide.emergencyNumbers.byService?.fire ? (
+              <li class="small"><strong>Fire:</strong> {guide.emergencyNumbers.byService.fire}</li>
+            ) : null}
+          </ul>
+          {guide.emergencyNumbers.notes ? (
+            <p class="small">{guide.emergencyNumbers.notes}</p>
+          ) : null}
+          <p class="small">Emergency numbers can vary by region/provider — if you’re travelling, check locally when possible.</p>
+        </div>
+      ) : null}
+
       {guide.tips?.length ? (
         <div>
           <h3>Tips</h3>
