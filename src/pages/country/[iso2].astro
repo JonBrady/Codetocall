@@ -89,11 +89,22 @@ const faqJsonLd = {
             </ul>
           ) : null}
 
-          {guide.nonEmergencyNumbers?.medical ? (
-            <p class="small" style="margin-top: 10px;">
-              <strong>Non-emergency medical:</strong> {guide.nonEmergencyNumbers.medical}
-              {guide.nonEmergencyNumbers.notes ? ` — ${guide.nonEmergencyNumbers.notes}` : ''}
-            </p>
+          {guide.nonEmergencyNumbers?.medical || guide.nonEmergencyNumbers?.police ? (
+            <div style="margin-top: 10px;">
+              {guide.nonEmergencyNumbers?.medical ? (
+                <p class="small" style="margin: 0 0 6px;">
+                  <strong>Non-emergency medical:</strong> {guide.nonEmergencyNumbers.medical}
+                </p>
+              ) : null}
+              {guide.nonEmergencyNumbers?.police ? (
+                <p class="small" style="margin: 0;">
+                  <strong>Non-emergency police:</strong> {guide.nonEmergencyNumbers.police}
+                </p>
+              ) : null}
+              {guide.nonEmergencyNumbers.notes ? (
+                <p class="small" style="margin: 8px 0 0;">{guide.nonEmergencyNumbers.notes}</p>
+              ) : null}
+            </div>
           ) : null}
 
           {guide.emergencyNumbers.notes ? (

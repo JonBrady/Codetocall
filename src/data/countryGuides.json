@@ -8,7 +8,8 @@
     },
     "nonEmergencyNumbers": {
       "medical": "111",
-      "notes": "111 is the NHS non-emergency medical number (UK)."
+      "police": "101",
+      "notes": "111 is the NHS non-emergency medical number. 101 is the non-emergency number for police (UK)."
     },
     "tips": [
       "Domestic UK format often starts with 0 (e.g. 020…, 07…). International format typically removes that 0.",
