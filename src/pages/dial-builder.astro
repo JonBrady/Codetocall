@@ -85,7 +85,7 @@ const faqJsonLd = {
 
       <div style="grid-column: 1 / -1;">
         <label for="num">Phone number</label>
-        <input id="num" type="text" placeholder="e.g. 07911 123 456, (0)20 7123 4567, +33 (0)1 44 55 66 77" />
+        <input id="num" type="text" inputmode="tel" autocomplete="tel" placeholder="e.g. 07911 123 456, (0)20 7123 4567, +33 (0)1 44 55 66 77" />
         <div class="small" style="margin-top: 8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <span>Tip: You can share a link that opens with countries pre-selected.</span>
           <button type="button" id="copyShareLink">Copy share link</button>
@@ -148,6 +148,11 @@ const faqJsonLd = {
     const $outLegacy = document.getElementById('outLegacy');
     const $warnings = document.getElementById('warnings');
     const $copyShareLink = document.getElementById('copyShareLink');
+
+    function sanitizeUserInput(input) {
+      // Allow digits plus common phone formatting characters; strip everything else.
+      return (input || '').replace(/[^0-9+()\s\-\.]/g, '');
+    }
 
     function stripFormatting(input) {
       const trimmed = (input || '').trim();
@@ -280,9 +285,42 @@ const faqJsonLd = {
       copyButtonFeedback($copyShareLink, url.toString());
     });
 
+    function enforceSanitizedNumberInput() {
+      const sanitized = sanitizeUserInput($num.value);
+      if ($num.value !== sanitized) {
+        const start = $num.selectionStart;
+        const end = $num.selectionEnd;
+        $num.value = sanitized;
+        // Best-effort caret preservation.
+        try {
+          if (start != null && end != null) $num.setSelectionRange(start, end);
+        } catch {}
+      }
+    }
+
     $from.addEventListener('change', update);
     $to.addEventListener('change', update);
-    $num.addEventListener('input', update);
+
+    $num.addEventListener('beforeinput', () => {
+      queueMicrotask(() => {
+        enforceSanitizedNumberInput();
+        update();
+      });
+    });
+    $num.addEventListener('input', () => {
+      enforceSanitizedNumberInput();
+      update();
+    });
+    $num.addEventListener('change', () => {
+      enforceSanitizedNumberInput();
+      update();
+    });
+    $num.addEventListener('paste', () => {
+      queueMicrotask(() => {
+        enforceSanitizedNumberInput();
+        update();
+      });
+    });
 
     // Init from query params
     const q = new URLSearchParams(window.location.search);
@@ -292,6 +330,9 @@ const faqJsonLd = {
     if (byIso2.has(qFrom)) $from.value = qFrom;
     if (byIso2.has(qTo)) $to.value = qTo;
     if (qNum) $num.value = qNum;
+
+    // Sanitize once on load so the field never starts with letters.
+    enforceSanitizedNumberInput();
 
     // Sensible defaults for demo
     if (!qFrom) $from.value = 'GB';

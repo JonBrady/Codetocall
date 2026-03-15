@@ -40,7 +40,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       <div style="grid-column: 1 / -1;">
         <label for="num">Please enter the number you want to call</label>
-        <input id="num" type="text" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
+        <input id="num" type="text" inputmode="tel" autocomplete="tel" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
         <div class="small" style="margin-top: 8px;">
           Tip: If you paste a number starting with <span class="kbd">+</span>, we’ll auto-detect the destination and update “Calling to”.
         </div>
@@ -203,6 +203,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }, 60_000);
     }
 
+    function sanitizeUserInput(input) {
+      // Allow digits plus common phone formatting characters; strip everything else.
+      // This prevents confusing states like letters being “accepted” in the UI.
+      return (input || '').replace(/[^0-9+()\s\-\.]/g, '');
+    }
+
     function stripFormatting(input) {
       const trimmed = (input || '').trim();
       const hasPlus = trimmed.startsWith('+');
@@ -229,7 +235,6 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       if (!dest || !tzList.length) {
         activeTzId = null;
-        $destTime.textContent = '';
         $timeBand.style.display = 'none';
         $timeBandText.textContent = '';
         $tzWrap.style.display = 'none';
@@ -469,12 +474,50 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
     document.getElementById('copyBtn').addEventListener('click', copyWithFeedback);
 
+    function enforceSanitizedNumberInput() {
+      const sanitized = sanitizeUserInput($num.value);
+      if ($num.value !== sanitized) {
+        const start = $num.selectionStart;
+        const end = $num.selectionEnd;
+        $num.value = sanitized;
+        // Best-effort caret preservation.
+        try {
+          if (start != null && end != null) $num.setSelectionRange(start, end);
+        } catch {}
+      }
+    }
+
     $from.addEventListener('change', update);
     $to.addEventListener('change', update);
-    $num.addEventListener('input', update);
+
+    // Sanitize aggressively so letters never “stick” in the UI (some IME/input paths can bypass a plain 'input' handler).
+    $num.addEventListener('beforeinput', () => {
+      // beforeinput fires prior to DOM value update in most browsers; queue a microtask to sanitize after update.
+      queueMicrotask(() => {
+        enforceSanitizedNumberInput();
+        update();
+      });
+    });
+    $num.addEventListener('input', () => {
+      enforceSanitizedNumberInput();
+      update();
+    });
+    $num.addEventListener('change', () => {
+      enforceSanitizedNumberInput();
+      update();
+    });
+    $num.addEventListener('paste', () => {
+      queueMicrotask(() => {
+        enforceSanitizedNumberInput();
+        update();
+      });
+    });
 
     const $brandHome = document.getElementById('brandHome');
     const $advancedLink = document.getElementById('advancedLink');
+
+    // If we restored from URL/localStorage, sanitize once on load so the box never starts with letters.
+    enforceSanitizedNumberInput();
 
     const STATE_KEY = 'codetocall_home_state_v1';
 
