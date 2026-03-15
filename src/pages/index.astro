@@ -40,7 +40,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       <div style="grid-column: 1 / -1;">
         <label for="num">Please enter the number you want to call</label>
-        <input id="num" type="text" inputmode="tel" autocomplete="tel" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
+        <input id="num" type="text" inputmode="tel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
         <div class="small" style="margin-top: 8px;">
           Tip: If you paste a number starting with <span class="kbd">+</span>, we’ll auto-detect the destination and update “Calling to”.
         </div>
