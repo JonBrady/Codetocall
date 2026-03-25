@@ -105,6 +105,18 @@ const faqJsonLd = {
         <code class="kbd" id="outLegacy">—</code>
         <button type="button" id="copyLegacy">Copy</button>
       </div>
+
+      <div class="outputRow">
+        <div style="min-width: 140px;" class="small">Tap-to-call link</div>
+        <code class="kbd" id="outTel">—</code>
+        <button type="button" id="copyTel">Copy</button>
+      </div>
+
+      <div class="outputRow">
+        <div style="min-width: 140px;" class="small">WhatsApp link</div>
+        <code class="kbd" id="outWa">—</code>
+        <button type="button" id="copyWa">Copy</button>
+      </div>
     </div>
 
     <div id="warnings" class="small" style="margin-top: 12px;"></div>
@@ -135,6 +147,12 @@ const faqJsonLd = {
   <script type="application/json" id="data-countries" set:html={JSON.stringify(countries)} />
   <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
 
+  <!-- libphonenumber-js (client-side) for correct E.164 formatting when user types national numbers -->
+  <script type="module">
+    import { parsePhoneNumberFromString } from 'libphonenumber-js';
+    window.libphonenumber = { parsePhoneNumberFromString };
+  </script>
+
   <script>
     const countries = JSON.parse(document.getElementById('data-countries').textContent);
     const exitCodes = JSON.parse(document.getElementById('data-exit').textContent);
@@ -146,6 +164,8 @@ const faqJsonLd = {
     const $num = document.getElementById('num');
     const $outE164 = document.getElementById('outE164');
     const $outLegacy = document.getElementById('outLegacy');
+    const $outTel = document.getElementById('outTel');
+    const $outWa = document.getElementById('outWa');
     const $warnings = document.getElementById('warnings');
     const $copyShareLink = document.getElementById('copyShareLink');
 
@@ -177,6 +197,19 @@ const faqJsonLd = {
       const raw0 = removeOptionalZeroMarker(raw);
       const stripped = stripFormatting(raw0);
 
+      // If we have a destination context and the user did NOT paste a + number,
+      // try to parse/format with libphonenumber for correct trunk-prefix handling.
+      try {
+        if (destination?.iso2 && stripped && !stripped.startsWith('+') && window.libphonenumber?.parsePhoneNumberFromString) {
+          const pn = window.libphonenumber.parsePhoneNumberFromString(stripped, destination.iso2);
+          if (pn && pn.isValid && pn.isValid()) {
+            return { e164: pn.number, nsn: pn.nationalNumber, warnings };
+          }
+        }
+      } catch {
+        // fall through to heuristic logic
+      }
+
       if (stripped.startsWith('+')) {
         const digits = stripped.slice(1);
         const c = findCountryByCallingCodePrefix(digits);
@@ -195,9 +228,19 @@ const faqJsonLd = {
       }
 
       const trunk = destination.trunkPrefix;
+
+      if (!trunk && /^00/.test(national)) {
+        warnings.push('This number starts with 00 (an international dialing prefix). Consider pasting the number with a leading + instead.');
+      }
+
       if (trunk && national.startsWith(trunk)) {
         national = national.slice(trunk.length);
         warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
+      } else if (!trunk && /^0+/.test(national)) {
+        // Heuristic: most countries use a leading 0 as a national trunk prefix.
+        // When building an international E.164 number, drop it.
+        national = national.replace(/^0+/, '');
+        warnings.push('Dropped leading 0 trunk prefix for international dialing.');
       } else if (trunk && /^(0)+/.test(national)) {
         warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
       }
@@ -213,12 +256,19 @@ const faqJsonLd = {
       if (!origin || !dest) {
         $outE164.textContent = '—';
         $outLegacy.textContent = '—';
+        if ($outTel) $outTel.textContent = '—';
+        if ($outWa) $outWa.textContent = '—';
         $warnings.textContent = 'Choose both an origin and destination country.';
         return;
       }
 
       const { e164, nsn, warnings } = normalizeForDestination(raw, dest);
       $outE164.textContent = e164 ?? '—';
+      if ($outTel) $outTel.textContent = e164 ? `tel:${e164}` : '—';
+      if ($outWa) {
+        const digits = e164 ? String(e164).replace(/[^0-9]/g, '') : '';
+        $outWa.textContent = e164 ? `https://wa.me/${digits}` : '—';
+      }
 
       const exit = exitCodes[origin.iso2];
       if (!exit) warnings.push(`No exit code (IDD prefix) configured for ${origin.name} yet.`);
@@ -271,8 +321,13 @@ const faqJsonLd = {
 
     const $copyE164 = document.getElementById('copyE164');
     const $copyLegacy = document.getElementById('copyLegacy');
+    const $copyTel = document.getElementById('copyTel');
+    const $copyWa = document.getElementById('copyWa');
+
     $copyE164.addEventListener('click', () => copyWithFeedback($copyE164, $outE164.textContent));
     $copyLegacy.addEventListener('click', () => copyWithFeedback($copyLegacy, $outLegacy.textContent));
+    if ($copyTel) $copyTel.addEventListener('click', () => copyWithFeedback($copyTel, $outTel.textContent));
+    if ($copyWa) $copyWa.addEventListener('click', () => copyWithFeedback($copyWa, $outWa.textContent));
 
     $copyShareLink.addEventListener('click', () => {
       const origin = byIso2.get($from.value);

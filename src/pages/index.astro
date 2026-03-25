@@ -62,6 +62,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       </div>
       <div class="heroActions">
         <a id="callLink" class="btn primary" href="#" aria-disabled="true">Call now</a>
+        <a id="waLink" class="btn" href="#" aria-disabled="true" target="_blank" rel="noopener noreferrer">WhatsApp</a>
         <button type="button" id="copyBtn">Copy</button>
         <a id="advancedLink" class="btn adv" href="/dial-builder/" style="margin-left:auto;">Advanced builder →</a>
       </div>
@@ -76,6 +77,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
   <div id="timeBand" class="band" aria-label="Destination local time" style="display:none;">
     <div class="bandTitle">Local time at destination</div>
     <div id="timeBandText" class="bandText small"></div>
+    <div id="timeBandHint" class="bandText small" style="margin-top:4px;"></div>
     <div id="tzWrap" class="bandText small" style="margin-top:6px; display:none;"></div>
   </div>
 
@@ -137,10 +139,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $heroContext = document.getElementById('heroContext');
     const $copyBtn = document.getElementById('copyBtn');
     const $callLink = document.getElementById('callLink');
+    const $waLink = document.getElementById('waLink');
     const $altDial = document.getElementById('altDial');
     const $localDial = document.getElementById('localDial');
     const $timeBand = document.getElementById('timeBand');
     const $timeBandText = document.getElementById('timeBandText');
+    const $timeBandHint = document.getElementById('timeBandHint');
     const $tzWrap = document.getElementById('tzWrap');
 
     const timeZonesByIso2 = {
@@ -186,6 +190,41 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
     }
 
+    function getLocalTimeInfo(tzId) {
+      if (!tzId) return null;
+      try {
+        const parts = new Intl.DateTimeFormat(undefined, {
+          timeZone: tzId,
+          weekday: 'long',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        }).formatToParts(new Date());
+
+        const get = (type) => parts.find((p) => p.type === type)?.value;
+        const weekday = get('weekday') || '';
+        const hourStr = get('hour');
+        const minuteStr = get('minute');
+        const hour = hourStr != null ? Number.parseInt(hourStr, 10) : null;
+
+        // Use a stable HH:MM output for hints.
+        const time24 = (hourStr != null && minuteStr != null) ? `${hourStr}:${minuteStr}` : null;
+
+        return { weekday, hour, time24 };
+      } catch {
+        return null;
+      }
+    }
+
+    function buildCallHint(localHour) {
+      if (localHour == null || Number.isNaN(localHour)) return '';
+      if (localHour < 7) return 'It’s very early there — unless it’s urgent, consider waiting.';
+      if (localHour < 9) return 'It’s early there — you might want to wait for office hours.';
+      if (localHour < 18) return 'It’s daytime there — likely a reasonable time to call.';
+      if (localHour < 21) return 'It’s evening there — fine for personal calls, maybe late for businesses.';
+      return 'It’s late there — you might want to wait until tomorrow.';
+    }
+
     let activeDestIso2 = null;
     let activeTzId = null;
     let tickTimer = null;
@@ -196,10 +235,12 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         // Re-render the displayed time every minute.
         if (!activeDestIso2 || !activeTzId) return;
         const t = formatLocalTime(activeTzId);
+        const info = getLocalTimeInfo(activeTzId);
         const dest = byIso2.get(activeDestIso2);
         if (!t || !dest) return;
         $timeBand.style.display = '';
-        $timeBandText.textContent = `${dest.name}: ${t}`;
+        $timeBandText.textContent = info?.weekday && info?.time24 ? `${dest.name}: ${info.weekday} ${info.time24}` : `${dest.name}: ${t}`;
+        if ($timeBandHint) $timeBandHint.textContent = buildCallHint(info?.hour);
       }, 60_000);
     }
 
@@ -237,6 +278,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         activeTzId = null;
         $timeBand.style.display = 'none';
         $timeBandText.textContent = '';
+        if ($timeBandHint) $timeBandHint.textContent = '';
         $tzWrap.style.display = 'none';
         $tzWrap.innerHTML = '';
         return;
@@ -248,13 +290,16 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       }
 
       const t = formatLocalTime(activeTzId);
+      const info = getLocalTimeInfo(activeTzId);
 
       if (t) {
         $timeBand.style.display = '';
-        $timeBandText.textContent = `${dest.name}: ${t}`;
+        $timeBandText.textContent = info?.weekday && info?.time24 ? `${dest.name}: ${info.weekday} ${info.time24}` : `${dest.name}: ${t}`;
+        if ($timeBandHint) $timeBandHint.textContent = buildCallHint(info?.hour);
       } else {
         $timeBand.style.display = 'none';
         $timeBandText.textContent = '';
+        if ($timeBandHint) $timeBandHint.textContent = '';
       }
 
       // Show selector only when there are multiple zones.
@@ -307,6 +352,19 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         $callLink.href = '#';
         $callLink.setAttribute('aria-disabled', 'true');
         $callLink.classList.add('disabled');
+      }
+
+      if ($waLink) {
+        if (canCall) {
+          const digits = String(e164).replace(/[^0-9]/g, '');
+          $waLink.href = `https://wa.me/${digits}`;
+          $waLink.setAttribute('aria-disabled', 'false');
+          $waLink.classList.remove('disabled');
+        } else {
+          $waLink.href = '#';
+          $waLink.setAttribute('aria-disabled', 'true');
+          $waLink.classList.add('disabled');
+        }
       }
 
       $copyBtn.disabled = !canCall;
