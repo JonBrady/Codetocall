@@ -58,16 +58,36 @@ converted consistently, with invalid or ambiguous input explained clearly.
 
 ## Recovery checkpoint
 
-Checkpoint: commit `49fc6eb` on `agent/recovery-foundation`
+Checkpoint: commit `a8e1c39` on `agent/recovery-foundation`
 
-- The recovery branch is pushed to GitHub and its warning-free CI run passed.
-- Nine dialing tests pass, 245 country records validate, and 458 static pages build.
-- The live `main` branch has not been changed.
+- The recovery branch is pushed to GitHub and builds successfully on Cloudflare Pages.
+- Fifteen automated checks pass, 245 country records validate, and 459 static pages build.
+- The live `main` branch remains at `09aa45f` and has not been changed.
 - Analytics remains consent-gated and adverts remain disabled.
-- Cloudflare preview/dashboard verification is the next step.
-- Cloudflare inspection is paused because loading and inspecting the dashboard
-  repeatedly crashed the Codex in-app browser after the PC restart. Resume via a
-  stable signed-in browser session or a narrowly scoped Cloudflare API token.
+- Chrome provides stable signed-in access to Cloudflare and Google Search Console.
+- Current review deployment: `https://ee2c1d3b.codetocall.pages.dev/`.
+
+## Search visibility audit — 28 July 2026
+
+- Search Console reported 10,136 impressions and 0 clicks in the previous three months,
+  with an average position of 71.8.
+- The highest-impression pages were Spain (4,395), Germany (1,640), India (1,636),
+  and Australia (1,186).
+- Google reported 64 indexed pages and 412 not indexed: 367 discovered but not
+  indexed, 34 crawled but not indexed, and 11 in smaller technical categories.
+- The sitemap is healthy, last read 27 July 2026, with 457 discovered pages.
+- The evidence points to too many similar pages and weak internal navigation rather
+  than a broken sitemap.
+- `http://www.codetocall.com/` currently returns Cloudflare error 522. Repair the
+  `www` DNS/redirect separately before asking Google to validate that issue.
+
+Implemented on the preview branch:
+
+- clean canonical URLs that remove calculator query strings from Google indexing;
+- restored curated examples and trunk-prefix rules lost by the old data build;
+- distinct guidance for Spain, Germany, India, and Australia;
+- human-readable route links and a searchable country-code directory;
+- clearer navigation between the calculator and country pages.
 
 ## Next phase: earn search visibility
 
