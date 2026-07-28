@@ -35,12 +35,10 @@ const faqs = [
     q: `How do I call ${country.name} from another country?`,
     a: `Dial your international exit code, then ${country.callingCode}, then the national number. In mobile-friendly format you can usually dial +${country.callingCode} followed by the national number.`,
   },
-  {
+  ...(country.trunkPrefix ? [{
     q: `Do I drop a leading 0 when calling ${country.name} internationally?`,
-    a: country.trunkPrefix
-      ? `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`
-      : `${country.name} does not have a trunk prefix listed in the dataset right now, but formatting varies; use the dial builder to normalize your specific number.`,
-  },
+    a: `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`,
+  }] : []),
   // Country-specific FAQs (hand-curated, stored in src/data/countryGuides.json)
   ...(guide?.faqs ?? []).map((f) => ({ q: f.q, a: f.a })),
 ];
@@ -160,7 +158,7 @@ const faqJsonLd = {
           Trunk prefix note: domestic numbers may start with <span class="kbd">{country.trunkPrefix}</span>. When calling from abroad, you usually <strong>drop</strong> that leading <span class="kbd">{country.trunkPrefix}</span>.
         </p>
       ) : (
-        <p class="small">Trunk prefix note: none listed for this country in the dataset yet.</p>
+        <p class="small">Leading-zero rules vary by numbering plan. Use the example above or the Dial Builder rather than removing a digit automatically.</p>
       )}
 
       <p>
