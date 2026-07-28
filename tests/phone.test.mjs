@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import {
   buildDialStrings,
   normalizeNumberForDestination,
+  sanitizePhoneInput,
+  MAX_PHONE_INPUT_LENGTH,
 } from '../src/lib/dialing.ts';
+
+const allCountries = JSON.parse(
+  readFileSync(new URL('../src/data/countries.generated.json', import.meta.url), 'utf8'),
+);
 
 const countries = [
   { name: 'Australia', iso2: 'AU', callingCode: '61', trunkPrefix: '0' },
@@ -89,9 +96,52 @@ test('does not make invalid input dialable', () => {
   const result = build('US', 'GB', '123');
   assert.equal(result.e164, null);
   assert.equal(result.legacy, null);
-  assert.match(result.warnings.join(' '), /impossible length|not valid/);
+  assert.match(result.warnings.join(' '), /too short|not valid/);
 });
 
+test('reports too-short and too-long input across every country record', () => {
+  for (const destination of allCountries) {
+    const tooShort = normalizeNumberForDestination({
+      raw: '1',
+      destination,
+      countries: allCountries,
+    });
+    assert.equal(tooShort.e164, null, destination.iso2);
+    assert.match(tooShort.warnings.join(' '), /too short/, destination.iso2);
+
+    const tooLong = normalizeNumberForDestination({
+      raw: '1'.repeat(25),
+      destination,
+      countries: allCountries,
+    });
+    assert.equal(tooLong.e164, null, destination.iso2);
+    assert.match(tooLong.warnings.join(' '), /too long/, destination.iso2);
+  }
+});
+
+test('explains an unrecognized international calling code', () => {
+  const result = build('GB', 'US', '+999 123 456');
+  assert.equal(result.e164, null);
+  assert.match(result.warnings.join(' '), /calling code is not recognized/);
+});
+test('explains when a national number is too long', () => {
+  const result = build('GB', 'US', '07911123456');
+  assert.equal(result.e164, null);
+  assert.equal(result.legacy, null);
+  assert.match(result.warnings.join(' '), /too long for United States/);
+});
+
+test('explains international number length errors', () => {
+  const result = build('GB', 'US', '+1 212 555 0123 4');
+  assert.equal(result.e164, null);
+  assert.equal(result.legacy, null);
+  assert.match(result.warnings.join(' '), /too long for United States/);
+});
+
+test('keeps formatted input within the universal safety limit', () => {
+  const sanitized = sanitizePhoneInput('1'.repeat(MAX_PHONE_INPUT_LENGTH + 20));
+  assert.equal(sanitized.length, MAX_PHONE_INPUT_LENGTH);
+});
 test('does not guess an unconfigured exit code', () => {
   const result = build('CA', 'GB', '020 7123 4567');
   assert.equal(result.e164, '+442071234567');

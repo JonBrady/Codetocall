@@ -2,6 +2,7 @@
 import Layout from '../components/Layout.astro';
 import countries from '../data/countries.generated.json';
 import exitCodes from '../data/exitCodes.json';
+import { MAX_PHONE_INPUT_LENGTH } from '../lib/dialing';
 
 const title = 'CodeToCall — International dialing made simple';
 const description = 'Pick where you’re calling from and to, paste the number, and copy the exact international number to dial (tap-to-call on mobile).';
@@ -40,7 +41,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       <div style="grid-column: 1 / -1;">
         <label for="num">Please enter the number you want to call</label>
-        <input id="num" type="text" inputmode="tel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
+        <input id="num" type="text" inputmode="tel" maxlength={MAX_PHONE_INPUT_LENGTH} aria-describedby="heroStatus" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="e.g. +33 1 44 55 66 77, 07911 123 456, (0)20 7123 4567" />
         <div class="small" style="margin-top: 8px;">
           Tip: If you paste a number starting with <span class="kbd">+</span>, we’ll auto-detect the destination and update “Calling to”.
         </div>
@@ -271,6 +272,8 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       if ($heroStatus) {
         $heroStatus.textContent = showInvalidStatus ? primaryWarning : '';
       }
+
+      $num.setAttribute('aria-invalid', showInvalidStatus ? 'true' : 'false');
 
       const remainingWarnings = showInvalidStatus ? warnings.slice(1) : warnings;
       $warnings.innerHTML = (remainingWarnings && remainingWarnings.length)

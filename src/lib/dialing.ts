@@ -1,8 +1,12 @@
 import {
   parsePhoneNumberFromString,
+  validatePhoneNumberLength,
   type CountryCode,
   type PhoneNumber,
+  type ValidatePhoneNumberLengthResult,
 } from 'libphonenumber-js';
+
+export const MAX_PHONE_INPUT_LENGTH = 30;
 
 export type Country = {
   name: string;
@@ -30,7 +34,9 @@ export type DialStrings = NormalizedPhoneNumber & {
 };
 
 export function sanitizePhoneInput(input: string): string {
-  return (input || '').replace(/[^0-9+()\s\-.]/g, '');
+  return (input || '')
+    .replace(/[^0-9+()\s\-.]/g, '')
+    .slice(0, MAX_PHONE_INPUT_LENGTH);
 }
 
 export function stripFormatting(input: string): string {
@@ -88,6 +94,30 @@ function emptyResult(
   };
 }
 
+function lengthWarning(
+  issue: ValidatePhoneNumberLengthResult | undefined,
+  countryName?: string,
+): string | null {
+  const target = countryName ? ` for ${countryName}` : '';
+
+  switch (issue) {
+    case 'TOO_SHORT':
+      return `This number is too short${target}.`;
+    case 'TOO_LONG':
+      return `This number is too long${target}.`;
+    case 'INVALID_LENGTH':
+      return countryName
+        ? `This number has a length that is not used in ${countryName}.`
+        : 'This number has an invalid length.';
+    case 'INVALID_COUNTRY':
+      return 'This international calling code is not recognized.';
+    case 'NOT_A_NUMBER':
+      return 'Enter a phone number using digits.';
+    default:
+      return null;
+  }
+}
+
 export function normalizeNumberForDestination(opts: {
   raw: string;
   destination: Country;
@@ -100,6 +130,11 @@ export function normalizeNumberForDestination(opts: {
     return emptyResult(isInternationalInput, 'Enter a phone number.');
   }
 
+  const lengthIssue = validatePhoneNumberLength(
+    input,
+    opts.destination.iso2.toUpperCase() as CountryCode,
+  );
+
   const parsed = isInternationalInput
     ? parsePhoneNumberFromString(input)
     : parsePhoneNumberFromString(
@@ -108,11 +143,15 @@ export function normalizeNumberForDestination(opts: {
       );
 
   if (!parsed) {
+    const specificWarning = lengthWarning(
+      lengthIssue,
+      isInternationalInput ? undefined : opts.destination.name,
+    );
     return emptyResult(
       isInternationalInput,
-      isInternationalInput
+      specificWarning ?? (isInternationalInput
         ? 'This is not a recognized international phone number.'
-        : `This is not a recognized phone number for ${opts.destination.name}.`,
+        : `This is not a recognized phone number for ${opts.destination.name}.`),
     );
   }
 
@@ -125,7 +164,8 @@ export function normalizeNumberForDestination(opts: {
 
   if (!parsed.isPossible()) {
     warnings.push(
-      `This number has an impossible length for ${parsedDestination.name}.`,
+      lengthWarning(lengthIssue, parsedDestination.name)
+        ?? `This number has an invalid length for ${parsedDestination.name}.`,
     );
   } else if (!parsed.isValid()) {
     warnings.push(`This number is not valid for ${parsedDestination.name}.`);
