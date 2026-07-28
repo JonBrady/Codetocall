@@ -136,6 +136,8 @@ const faqJsonLd = {
   <script type="application/json" id="data-exit" set:html={JSON.stringify(exitCodes)} />
 
   <script>
+    import { buildDialStrings, sanitizePhoneInput } from '../lib/dialing';
+
     const countries = JSON.parse(document.getElementById('data-countries').textContent);
     const exitCodes = JSON.parse(document.getElementById('data-exit').textContent);
 
@@ -149,61 +151,6 @@ const faqJsonLd = {
     const $warnings = document.getElementById('warnings');
     const $copyShareLink = document.getElementById('copyShareLink');
 
-    function sanitizeUserInput(input) {
-      // Allow digits plus common phone formatting characters; strip everything else.
-      return (input || '').replace(/[^0-9+()\s\-\.]/g, '');
-    }
-
-    function stripFormatting(input) {
-      const trimmed = (input || '').trim();
-      const hasPlus = trimmed.startsWith('+');
-      const digitsOnly = trimmed.replace(/[^0-9]/g, '');
-      return hasPlus ? `+${digitsOnly}` : digitsOnly;
-    }
-
-    function removeOptionalZeroMarker(input) {
-      return (input || '').replace(/\(0\)/g, '');
-    }
-
-    function findCountryByCallingCodePrefix(digits) {
-      const matches = countries
-        .filter(c => digits.startsWith(c.callingCode))
-        .sort((a, b) => b.callingCode.length - a.callingCode.length);
-      return matches[0];
-    }
-
-    function normalizeForDestination(raw, destination) {
-      const warnings = [];
-      const raw0 = removeOptionalZeroMarker(raw);
-      const stripped = stripFormatting(raw0);
-
-      if (stripped.startsWith('+')) {
-        const digits = stripped.slice(1);
-        const c = findCountryByCallingCodePrefix(digits);
-        if (!c) {
-          warnings.push('This looks like an international number (+...), but the country code is not recognized in the current dataset.');
-          return { e164: `+${digits}`, nsn: null, warnings };
-        }
-        const nsn = digits.slice(c.callingCode.length);
-        return { e164: `+${c.callingCode}${nsn}`, nsn, warnings };
-      }
-
-      let national = stripped;
-      if (!national) {
-        warnings.push('Enter a phone number.');
-        return { e164: null, nsn: null, warnings };
-      }
-
-      const trunk = destination.trunkPrefix;
-      if (trunk && national.startsWith(trunk)) {
-        national = national.slice(trunk.length);
-        warnings.push(`Dropped leading trunk prefix “${trunk}” for international dialing.`);
-      } else if (trunk && /^(0)+/.test(national)) {
-        warnings.push('This number starts with 0. Many countries require dropping the leading 0 when calling internationally.');
-      }
-
-      return { e164: `+${destination.callingCode}${national}`, nsn: national, warnings };
-    }
 
     function update() {
       const origin = byIso2.get($from.value);
@@ -217,21 +164,27 @@ const faqJsonLd = {
         return;
       }
 
-      const { e164, nsn, warnings } = normalizeForDestination(raw, dest);
-      $outE164.textContent = e164 ?? '—';
-
-      const exit = exitCodes[origin.iso2];
-      if (!exit) warnings.push(`No exit code (IDD prefix) configured for ${origin.name} yet.`);
-      $outLegacy.textContent = exit && nsn ? `${exit} ${dest.callingCode} ${nsn}` : '—';
-
-      $warnings.innerHTML = warnings.length
-        ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
+      const result = buildDialStrings({
+        originIso2: origin.iso2,
+        destinationIso2: dest.iso2,
+        rawNumber: raw,
+        countries,
+        exitCodes,
+      });
+      if (result.isInternationalInput && result.destinationIso2 && byIso2.has(result.destinationIso2)) {
+        $to.value = result.destinationIso2;
+      }
+      $outE164.textContent = result.e164 ?? '—';
+      $outLegacy.textContent = result.legacy ?? '—';
+      $warnings.innerHTML = result.warnings.length
+        ? '<ul>' + result.warnings.map((warning) => `<li>${warning}</li>`).join('') + '</ul>'
         : '';
 
       // Keep URL in sync (cheap “shareable builder” feature)
+      const selectedDest = byIso2.get($to.value);
       const url = new URL(window.location.href);
       url.searchParams.set('from', origin.iso2);
-      url.searchParams.set('to', dest.iso2);
+      url.searchParams.set('to', selectedDest.iso2);
       history.replaceState({}, '', url);
     }
 
@@ -286,7 +239,7 @@ const faqJsonLd = {
     });
 
     function enforceSanitizedNumberInput() {
-      const sanitized = sanitizeUserInput($num.value);
+      const sanitized = sanitizePhoneInput($num.value);
       if ($num.value !== sanitized) {
         const start = $num.selectionStart;
         const end = $num.selectionEnd;

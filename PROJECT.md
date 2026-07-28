@@ -1,37 +1,28 @@
-# codetocall.com — Project
+# CodeToCall project
 
 ## Purpose
-Build an SEO-first, **static** international calling codes + dial-builder site designed to earn via **ad revenue**.
 
-Core loop:
-1) Publish lots of genuinely useful, indexable pages (country/calling-code intent)
-2) Keep pages fast + stable (no CLS)
-3) Once traffic exists, switch on ads cleanly
+Build a useful, accurate, search-led reference site for international calling
+codes and dialling instructions. Keep the operating cost close to zero while
+proving whether the site can attract repeatable organic traffic and eventually
+earn advertising revenue.
 
-## Non-negotiables
-- **Static-first** (Cloudflare Pages). Avoid SSR/Workers unless proven ROI.
-- Changes must be **safe + reversible** (git history, small diffs).
-- Protect UX: avoid layout shift, slow JS, or spammy pages.
+## Architecture
 
-## Repo
-- Path: `/home/jon/.openclaw/workspace/calling-codes/site`
-- Framework: Astro static output
+- Astro static output hosted on Cloudflare Pages.
+- No server-side rendering, database, Worker, or paid request-time compute.
+- GitHub repository `JonBrady/Codetocall` is the source of truth.
+- `main` is production; other pushed branches are previews.
 
-## Deployment
-- Host: Cloudflare Pages
-- Domain: https://codetocall.com
-- Sitemap:
-  - https://codetocall.com/sitemap-index.xml
+## Product principles
 
-## Monetization
-- Keep ad slots present but CLS-safe.
-- Ads should be switchable via a single flag (default OFF until ready).
+- Correct answers before page-count growth.
+- Useful, differentiated pages rather than thin SEO inventory.
+- Fast pages with stable layouts.
+- Measurement before monetisation.
+- Preview-first, reversible releases.
+- Owner approval before any paid or metered service.
 
-## Current priorities
-1) Expand country dataset/pages (increase SEO surface area)
-2) Tighten titles/meta + add structured data where helpful
-3) Make ads toggleable and keep placeholders CLS-safe
-
-## Working notes
-- Session transcript for Search Console setup (Feb 27 late evening) is in:
-  `~/.openclaw/agents/main/sessions/a8df1885-d229-4f84-bbb3-33c3e3cf98fc.jsonl`
+The current priorities, decision metrics, monetisation gate, and portfolio rule
+are maintained in [RECOVERY_PLAN.md](./RECOVERY_PLAN.md). Operational procedures
+are in [DEPLOYMENT.md](./DEPLOYMENT.md).
