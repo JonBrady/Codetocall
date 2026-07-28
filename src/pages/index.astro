@@ -51,6 +51,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       <div class="small">Dial this</div>
       <div class="heroNumberWrap">
         <div id="heroNumber" class="heroNumber">—</div>
+        <div id="heroStatus" class="heroStatus" role="status" aria-live="polite"></div>
         <div id="heroHint" class="heroHint" aria-hidden="true">
           <div class="heroHintInner">
             <div class="heroHintTrack">
@@ -127,6 +128,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
     const $num = document.getElementById('num');
 
     const $heroNumber = document.getElementById('heroNumber');
+    const $heroStatus = document.getElementById('heroStatus');
     const $heroMeta = document.getElementById('heroMeta');
     const $warnings = document.getElementById('warnings');
     const $heroHint = document.getElementById('heroHint');
@@ -256,7 +258,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
       startTicker();
     }
 
-    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText, contextText) {
+    function setHero(e164, meta, warnings, destIso2, altDialText, localDialText, contextText, hasInput = false) {
       $heroNumber.textContent = e164 || '';
       $heroMeta.textContent = meta || '';
       $altDial.textContent = altDialText || '';
@@ -264,8 +266,15 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       renderTimeUI(destIso2);
 
-      $warnings.innerHTML = (warnings && warnings.length)
-        ? '<ul>' + warnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
+      const primaryWarning = warnings?.[0] || '';
+      const showInvalidStatus = !e164 && hasInput && primaryWarning !== 'Enter a phone number.';
+      if ($heroStatus) {
+        $heroStatus.textContent = showInvalidStatus ? primaryWarning : '';
+      }
+
+      const remainingWarnings = showInvalidStatus ? warnings.slice(1) : warnings;
+      $warnings.innerHTML = (remainingWarnings && remainingWarnings.length)
+        ? '<ul>' + remainingWarnings.map(w => `<li>${w}</li>`).join('') + '</ul>'
         : '';
 
       if ($heroContext) {
@@ -287,8 +296,9 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
 
       // Show a subtle marquee hint when nothing has been entered yet.
       if ($heroHint) {
-        $heroHint.style.display = canCall ? 'none' : 'flex';
-        $heroHint.setAttribute('aria-hidden', canCall ? 'true' : 'false');
+        const showHint = !canCall && !showInvalidStatus;
+        $heroHint.style.display = showHint ? 'flex' : 'none';
+        $heroHint.setAttribute('aria-hidden', showHint ? 'false' : 'true');
       }
 
       // Hide buttons until there is a valid number (prevents overlap + makes the hero calmer).
@@ -352,6 +362,7 @@ const countryOptions = [...countries].sort((a, b) => a.name.localeCompare(b.name
         alt,
         localLine,
         contextText,
+        Boolean(raw?.trim()),
       );
     }
 
