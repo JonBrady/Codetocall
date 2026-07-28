@@ -1,0 +1,88 @@
+---
+import Layout from '../components/Layout.astro';
+import countries from '../data/countries.generated.json';
+
+const title = 'Country calling codes — international dialling directory';
+const description = 'Find the international calling code for any country or territory, with examples and a dial builder for the exact number to call.';
+
+const sortedCountries = [...countries].sort((a, b) => a.name.localeCompare(b.name));
+const groups = Object.entries(
+  sortedCountries.reduce((result, country) => {
+    const letter = country.name.charAt(0).toUpperCase();
+    (result[letter] ??= []).push(country);
+    return result;
+  }, {}),
+);
+---
+
+<Layout title={title} description={description}>
+  <p class="eyebrow">International dialling directory</p>
+  <h1 style="margin:22px 0 6px;">Country calling codes</h1>
+  <p class="small" style="max-width:72ch;">
+    Choose a country to see its calling code, number examples, leading-zero guidance and direct links into the dial builder.
+  </p>
+
+  <div class="card" style="margin-top:16px;">
+    <label for="countrySearch">Find a country or calling code</label>
+    <input id="countrySearch" type="search" placeholder="Try Spain, India or +61" autocomplete="off" />
+    <div id="countryCount" class="small" style="margin-top:8px;">Showing all {countries.length} countries and territories.</div>
+  </div>
+
+  <div class="countryDirectory" id="countryDirectory">
+    {groups.map(([letter, entries]) => (
+      <section class="countryGroup" data-country-group>
+        <h2>{letter}</h2>
+        <div class="countryList">
+          {entries.map((country) => (
+            <a
+              class="countryLink"
+              href={`/country/${country.iso2.toLowerCase()}/`}
+              data-country-link
+              data-name={`${country.name} ${country.iso2}`.toLowerCase()}
+              data-code={country.callingCode}
+            >
+              <span>{country.name}</span>
+              <span class="countryCode">+{country.callingCode}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <p id="countryEmpty" class="card" style="margin-top:16px;display:none;">
+    No matching country or calling code. Try a country name or digits such as <span class="kbd">34</span>.
+  </p>
+
+  <script>
+    const search = document.getElementById('countrySearch');
+    const groups = Array.from(document.querySelectorAll('[data-country-group]'));
+    const links = Array.from(document.querySelectorAll('[data-country-link]'));
+    const count = document.getElementById('countryCount');
+    const empty = document.getElementById('countryEmpty');
+
+    function filterCountries() {
+      const query = search.value.trim().toLowerCase().replace(/^\+/, '');
+      let visible = 0;
+
+      links.forEach((link) => {
+        const isNumber = /^\d+$/.test(query);
+        const isMatch = !query
+          || (isNumber ? link.dataset.code === query : link.dataset.name.includes(query));
+        link.hidden = !isMatch;
+        if (isMatch) visible += 1;
+      });
+
+      groups.forEach((group) => {
+        group.hidden = !group.querySelector('[data-country-link]:not([hidden])');
+      });
+
+      count.textContent = query
+        ? `${visible} ${visible === 1 ? 'match' : 'matches'}.`
+        : `Showing all ${links.length} countries and territories.`;
+      empty.style.display = visible ? 'none' : '';
+    }
+
+    search.addEventListener('input', filterCountries);
+  </script>
+</Layout>

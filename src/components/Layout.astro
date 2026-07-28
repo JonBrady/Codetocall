@@ -5,7 +5,10 @@ import ConsentHead from './ConsentHead.astro';
 import { ADS_RENDER } from '../lib/adsense';
 
 const { title, description, canonical } = Astro.props;
-const url = canonical ?? Astro.url;
+const siteOrigin = Astro.site ?? Astro.url.origin;
+const url = canonical
+  ? new URL(canonical.toString(), siteOrigin)
+  : new URL(Astro.url.pathname, siteOrigin);
 ---
 
 <!doctype html>
@@ -66,11 +69,10 @@ const url = canonical ?? Astro.url;
             </a>
             <div class="small">International dialing, made simple</div>
           </div>
-          <nav>
+          <nav class="siteNav" aria-label="Main navigation">
+            <a href="/countries/">Countries</a>
             <a href="/dial-builder/">Dial Builder</a>
             <a href="/about-data/">About</a>
-            <a href="/privacy-policy/">Privacy</a>
-            <a href="/contact/">Contact</a>
           </nav>
         </div>
       </div>

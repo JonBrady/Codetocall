@@ -7,8 +7,11 @@ import { getCountries, getCountryCallingCode } from 'libphonenumber-js';
 countries.registerLocale(enLocale);
 
 const OUT = path.join(process.cwd(), 'src', 'data', 'countries.generated.json');
+const CURATED = path.join(process.cwd(), 'src', 'data', 'countries.json');
 
 const iso2s = getCountries();
+const curatedRows = JSON.parse(await fs.readFile(CURATED, 'utf8'));
+const curatedByIso2 = new Map(curatedRows.map((country) => [country.iso2, country]));
 
 const rows = [];
 for (const iso2 of iso2s) {
@@ -21,11 +24,13 @@ for (const iso2 of iso2s) {
   }
   if (!callingCode) continue;
 
+  const curated = curatedByIso2.get(iso2) ?? {};
   rows.push({
     name,
     iso2,
     callingCode,
     trunkPrefix: null,
+    ...curated,
   });
 }
 

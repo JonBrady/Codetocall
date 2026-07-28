@@ -3,7 +3,9 @@
     "intro": "The UK uses the +44 calling code. UK numbers are often written with a leading 0 domestically (the trunk prefix). When calling the UK from abroad, you typically drop that leading 0 and dial +44 instead.",
     "emergencyNumbers": {
       "primary": "999",
-      "alternatives": ["112"],
+      "alternatives": [
+        "112"
+      ],
       "notes": "999 and 112 both connect to the UK emergency services."
     },
     "nonEmergencyNumbers": {
@@ -71,6 +73,78 @@
       {
         "q": "Do French numbers start with 0?",
         "a": "Domestically, yes — the leading 0 is common. Internationally, you typically drop it and dial +33 instead."
+      }
+    ]
+  },
+  "ES": {
+    "intro": "Spain uses calling code +34. Spanish national numbers are normally dialled after +34 without removing a separate domestic trunk prefix.",
+    "tips": [
+      "A Madrid landline such as 912 34 56 78 becomes +34 912 34 56 78 from abroad.",
+      "On a mobile, saving the number in +34 international format makes it easier to use both inside and outside Spain.",
+      "Use the complete national number after +34; Spanish geographic numbers do not use a removable leading 0."
+    ],
+    "commonMistakes": [
+      "Adding an extra 0 after +34.",
+      "Treating 34 as part of the local number instead of Spain's country calling code."
+    ],
+    "faqs": [
+      {
+        "q": "Do I drop a leading 0 when calling Spain?",
+        "a": "Spain does not use a separate domestic trunk prefix 0 for geographic numbers in the same way as many other European countries. Dial +34 followed by the complete national number."
+      }
+    ]
+  },
+  "DE": {
+    "intro": "Germany uses calling code +49. German area codes are written with a leading 0 for domestic calls; when calling from abroad, replace that 0 with +49.",
+    "tips": [
+      "A Berlin number written as 030 123456 becomes +49 30 123456 from abroad.",
+      "German area codes vary in length, so keep every digit of the area code except its first 0.",
+      "Using +49 is usually simpler than entering a separate international exit code on a mobile."
+    ],
+    "commonMistakes": [
+      "Dialling +49 0 followed by the area code; the domestic 0 should normally be removed.",
+      "Assuming every German area code has the same number of digits."
+    ],
+    "faqs": [
+      {
+        "q": "How do I call a Berlin number from abroad?",
+        "a": "Replace Berlin's domestic 030 prefix with +49 30, then dial the subscriber number."
+      }
+    ]
+  },
+  "IN": {
+    "intro": "India uses calling code +91. When an Indian landline is written with a domestic leading 0, remove that 0 when using +91.",
+    "tips": [
+      "A Bengaluru landline written as 080 1234 5678 becomes +91 80 1234 5678 from abroad.",
+      "For international format, place +91 before the national number and remove a domestic trunk-prefix 0 if one is present.",
+      "Keep the area code for landline calls."
+    ],
+    "commonMistakes": [
+      "Dialling +91 0 before an Indian area code.",
+      "Leaving out the landline area code."
+    ],
+    "faqs": [
+      {
+        "q": "Do I keep 0 before an Indian area code when calling internationally?",
+        "a": "Normally no. Remove the domestic leading 0 and use +91 before the area code and subscriber number."
+      }
+    ]
+  },
+  "AU": {
+    "intro": "Australia uses calling code +61. Australian landline and mobile numbers begin with 0 domestically; remove that 0 when calling from abroad.",
+    "tips": [
+      "A Sydney landline written as 02 1234 5678 becomes +61 2 1234 5678.",
+      "An Australian mobile written as 0412 345 678 becomes +61 412 345 678.",
+      "Using +61 is the simplest mobile-friendly format. Australia's legacy international exit code is 0011."
+    ],
+    "commonMistakes": [
+      "Dialling +61 0 followed by the Australian number.",
+      "Keeping 04 at the start of a mobile number after adding +61; it should normally begin +61 4."
+    ],
+    "faqs": [
+      {
+        "q": "How do I convert an Australian mobile number to international format?",
+        "a": "Remove the first 0 from the mobile number and place +61 in front. For example, 0412 345 678 becomes +61 412 345 678."
       }
     ]
   }

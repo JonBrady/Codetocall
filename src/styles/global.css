@@ -33,8 +33,9 @@ header.site{border-bottom:1px solid var(--borderSoft);background:var(--bg); bord
 main.container{position:relative; z-index:1}
 header.site{position:relative; z-index:2}
 header .row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0}
-nav a{margin-left:14px;color:var(--muted)}
-nav a:hover{color:var(--text)}
+.siteNav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.siteNav a{color:var(--muted);padding:8px 10px;border-radius:8px;font-weight:600}
+.siteNav a:hover{color:var(--text);background:rgba(26,115,232,.08);text-decoration:none}
 
 /* Wordmark */
 .brand{font-weight:900; letter-spacing:.01em; font-size: 18px; line-height:1; color:var(--text)}
@@ -46,6 +47,7 @@ nav a:hover{color:var(--text)}
 .card{background:var(--panel);border:1px solid var(--borderSoft);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 .small{color:var(--muted);font-size:.95rem}
+.eyebrow{margin:18px 0 -12px;color:var(--muted);font-size:.88rem;font-weight:700}
 .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:.95em;background:rgba(26,115,232,.08);border:1px solid rgba(26,115,232,.22);padding:2px 6px;border-radius:999px}
 
 input,select,button,textarea{font:inherit}
@@ -94,6 +96,19 @@ footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;
 .tileSub{margin-top:2px;color:var(--text)}
 .tile.selected{background:#6a6a6a;border-color:#6a6a6a;color:#fff}
 .tile.selected .tileTitle,.tile.selected .tileSub{color:#fff}
+.routeGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px}
+.routeCard{display:flex;flex-direction:column;gap:3px;padding:13px 14px;border:1px solid var(--borderSoft);border-radius:10px;background:#fff;color:var(--text);font-weight:800}
+.routeCard small{color:var(--muted);font-weight:500}
+.routeCard:hover{border-color:rgba(26,115,232,.45);background:rgba(26,115,232,.05);text-decoration:none}
+
+.countryDirectory{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:18px}
+.countryGroup{background:#fff;border:1px solid var(--borderSoft);border-radius:10px;padding:16px}
+.countryGroup h2{margin:0 0 10px;font-size:1.15rem}
+.countryList{display:grid;gap:4px}
+.countryLink{display:flex;justify-content:space-between;gap:12px;padding:7px 8px;border-radius:7px;color:var(--text)}
+.countryLink:hover{background:rgba(26,115,232,.07);text-decoration:none}
+.countryCode{color:var(--muted);font-weight:700}
+.countryGroup[hidden]{display:none}
 
 @media (max-width: 520px){
   .tile{min-width:120px;flex:1 1 120px}
@@ -102,5 +117,5 @@ footer{border-top:1px solid var(--borderSoft);color:var(--muted);padding:26px 0;
 /* Responsive polish */
 @media (max-width: 520px){
   header .row{flex-direction:column;align-items:flex-start}
-  nav a{margin-left:0;margin-right:14px}
+  .siteNav a{padding-left:0;padding-right:12px}
 }
