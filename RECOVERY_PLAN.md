@@ -20,7 +20,7 @@ before reusing the model for additional sites.
 
 ### 1. Make releases safe and repeatable
 
-Status: in progress
+Status: completed on `agent/recovery-foundation`
 
 - Replace the inherited OpenClaw-era setup notes.
 - Add automated build, data-validation, and correctness checks.
@@ -32,7 +32,7 @@ maintainer can operate the site without relying on the former agent.
 
 ### 2. Establish trustworthy measurement and consent
 
-Status: in progress
+Status: completed on `agent/recovery-foundation`
 
 - Add the existing GA4 property (`G-TZP3CBGKDT`) in consent-aware mode.
 - Keep analytics storage denied until the visitor chooses.
@@ -46,7 +46,7 @@ that a basic site banner alone makes advertising compliant.
 
 ### 3. Fix the product's core answer
 
-Status: in progress
+Status: completed on `agent/recovery-foundation`
 
 - Use `libphonenumber-js` as the shared formatter and validator.
 - Remove unsafe hand-written leading-zero rules.
@@ -55,6 +55,19 @@ Status: in progress
 
 Success means representative UK, US, European, and international numbers are
 converted consistently, with invalid or ambiguous input explained clearly.
+
+## Recovery checkpoint
+
+Checkpoint: commit `49fc6eb` on `agent/recovery-foundation`
+
+- The recovery branch is pushed to GitHub and its warning-free CI run passed.
+- Nine dialing tests pass, 245 country records validate, and 458 static pages build.
+- The live `main` branch has not been changed.
+- Analytics remains consent-gated and adverts remain disabled.
+- Cloudflare preview/dashboard verification is the next step.
+- Cloudflare inspection is paused because loading and inspecting the dashboard
+  repeatedly crashed the Codex in-app browser after the PC restart. Resume via a
+  stable signed-in browser session or a narrowly scoped Cloudflare API token.
 
 ## Next phase: earn search visibility
 
