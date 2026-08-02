@@ -65,7 +65,21 @@ Checkpoint: commit `a8e1c39` on `agent/recovery-foundation`
 - The live `main` branch remains at `09aa45f` and has not been changed.
 - Analytics remains consent-gated and adverts remain disabled.
 - Chrome provides stable signed-in access to Cloudflare and Google Search Console.
-- Current review deployment: `https://ee2c1d3b.codetocall.pages.dev/`.
+- Most recent public review deployment: `https://729ac0f3.codetocall.pages.dev/`.
+
+## Preview review — 2 August 2026
+
+- Re-ran the complete test, data-validation, and 459-page build successfully.
+- Compared the preview with Time.is and kept the focus on one large, immediate answer.
+- Found that the site loaded an older public stylesheet instead of the newer source
+  styles. The layout now uses one build-managed source stylesheet.
+- Replaced the oversized moving empty-state message with a calm instruction.
+- Restored the intended country-directory and country-route card layouts, and made
+  the popular destination links cleaner and easier to scan.
+- Replaced the `AC` and `TA` display-name fallbacks with `Ascension Island` and
+  `Tristan da Cunha`, and added validation to prevent ISO-code placeholder names.
+- Verified empty, valid, invalid, directory-search, and country-route states locally
+  with no browser errors. Production, DNS, adverts, and paid services remain unchanged.
 
 ## Search visibility audit — 28 July 2026
 

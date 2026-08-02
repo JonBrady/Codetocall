@@ -1,11 +1,5 @@
 [
   {
-    "name": "AC",
-    "iso2": "AC",
-    "callingCode": "247",
-    "trunkPrefix": null
-  },
-  {
     "name": "Afghanistan",
     "iso2": "AF",
     "callingCode": "93",
@@ -75,6 +69,12 @@
     "name": "Aruba",
     "iso2": "AW",
     "callingCode": "297",
+    "trunkPrefix": null
+  },
+  {
+    "name": "Ascension Island",
+    "iso2": "AC",
+    "callingCode": "247",
     "trunkPrefix": null
   },
   {
@@ -1333,12 +1333,6 @@
     "trunkPrefix": null
   },
   {
-    "name": "TA",
-    "iso2": "TA",
-    "callingCode": "290",
-    "trunkPrefix": null
-  },
-  {
     "name": "Taiwan, Province of China",
     "iso2": "TW",
     "callingCode": "886",
@@ -1390,6 +1384,12 @@
     "name": "Trinidad and Tobago",
     "iso2": "TT",
     "callingCode": "1",
+    "trunkPrefix": null
+  },
+  {
+    "name": "Tristan da Cunha",
+    "iso2": "TA",
+    "callingCode": "290",
     "trunkPrefix": null
   },
   {

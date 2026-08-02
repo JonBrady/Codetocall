@@ -3,6 +3,7 @@ import AdSlot from './AdSlot.astro';
 import ConsentBanner from './ConsentBanner.astro';
 import ConsentHead from './ConsentHead.astro';
 import { ADS_RENDER } from '../lib/adsense';
+import '../styles/global.css';
 
 const { title, description, canonical } = Astro.props;
 const siteOrigin = Astro.site ?? Astro.url.origin;
@@ -44,8 +45,6 @@ const url = canonical
     <!-- Time.is uses Montserrat for most text, and a custom clock font (TimeTraveler) for the big digits.
          We can match the feel with Montserrat + a heavy Montserrat weight for the hero number. -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-
-    <link rel="stylesheet" href="/styles/global.css?v=20260302-0024" />
 
     <ConsentHead />
 
