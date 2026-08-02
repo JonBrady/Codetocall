@@ -1,0 +1,110 @@
+---
+import { ADSENSE_CLIENT, ADSENSE_ENABLED, ADSENSE_MODE } from '../lib/adsense';
+
+const measurementId =
+  import.meta.env.PUBLIC_GA_MEASUREMENT_ID || 'G-TZP3CBGKDT';
+const adsenseClient = ADSENSE_ENABLED ? ADSENSE_CLIENT : '';
+const personalizedAds = ADSENSE_MODE === 'default';
+---
+
+<script is:inline define:vars={{ measurementId, adsenseClient, personalizedAds }}>
+  (() => {
+    const consentKey = 'codetocall-consent-v1';
+    let sessionChoice = null;
+    const denied = {
+      ad_storage: 'denied',
+      analytics_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+    };
+    const granted = {
+      ad_storage: adsenseClient ? 'granted' : 'denied',
+      analytics_storage: 'granted',
+      ad_user_data: adsenseClient ? 'granted' : 'denied',
+      ad_personalization: adsenseClient && personalizedAds ? 'granted' : 'denied',
+    };
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () {
+      window.dataLayer.push(arguments);
+    };
+
+    // Set Google Consent Mode defaults before any Google tag can execute.
+    window.gtag('consent', 'default', {
+      ...denied,
+      wait_for_update: 500,
+    });
+
+    const loadScriptOnce = (id, src) => {
+      if (!src || document.getElementById(id)) return;
+      const script = document.createElement('script');
+      script.id = id;
+      script.async = true;
+      script.src = src;
+      script.crossOrigin = 'anonymous';
+      document.head.appendChild(script);
+    };
+
+    const enableGoogleServices = () => {
+      window.gtag('consent', 'update', granted);
+
+      if (measurementId) {
+        loadScriptOnce(
+          'codetocall-google-analytics',
+          `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`,
+        );
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId, {
+          anonymize_ip: true,
+        });
+      }
+
+      if (adsenseClient) {
+        loadScriptOnce(
+          'codetocall-google-adsense',
+          `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(adsenseClient)}`,
+        );
+      }
+    };
+
+    window.codeToCallConsent = {
+      get() {
+        try {
+          return localStorage.getItem(consentKey) || sessionChoice;
+        } catch {
+          return sessionChoice;
+        }
+      },
+      set(choice) {
+        const previousChoice = this.get();
+        sessionChoice = choice;
+
+        try {
+          localStorage.setItem(consentKey, choice);
+        } catch {
+          // The choice still applies for this page when storage is unavailable.
+        }
+
+        if (choice === 'accepted') {
+          enableGoogleServices();
+        } else {
+          window.gtag('consent', 'update', denied);
+          if (previousChoice === 'accepted') {
+            window.location.reload();
+            return;
+          }
+        }
+
+        window.dispatchEvent(
+          new CustomEvent('codetocall:consent-change', {
+            detail: { choice },
+          }),
+        );
+      },
+    };
+
+    if (window.codeToCallConsent.get() === 'accepted') {
+      enableGoogleServices();
+    }
+  })();
+</script>

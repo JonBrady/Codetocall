@@ -15,11 +15,14 @@ if (!country) {
   throw new Error(`Unknown country: ${iso2}`);
 }
 
-const title = `${country.name} calling code (+${country.callingCode}) — how to dial`;
+const title = `${country.name} country code +${country.callingCode} — how to call ${country.name}`;
 const description = `How to call ${country.name} from abroad: what to dial, trunk-prefix notes, example formats, and a dial builder that outputs exact dial strings.`;
 
 const topOrigins = ['US', 'GB', 'CA', 'IE', 'FR', 'DE', 'ES', 'IT', 'AU', 'IN']
   .filter((x) => x !== country.iso2);
+const topOriginCountries = topOrigins
+  .map((originIso2) => countries.find((candidate) => candidate.iso2 === originIso2))
+  .filter(Boolean);
 
 const guide = countryGuides[country.iso2];
 
@@ -32,12 +35,10 @@ const faqs = [
     q: `How do I call ${country.name} from another country?`,
     a: `Dial your international exit code, then ${country.callingCode}, then the national number. In mobile-friendly format you can usually dial +${country.callingCode} followed by the national number.`,
   },
-  {
+  ...(country.trunkPrefix ? [{
     q: `Do I drop a leading 0 when calling ${country.name} internationally?`,
-    a: country.trunkPrefix
-      ? `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`
-      : `${country.name} does not have a trunk prefix listed in the dataset right now, but formatting varies; use the dial builder to normalize your specific number.`,
-  },
+    a: `Often yes — ${country.name} commonly uses a trunk prefix “${country.trunkPrefix}” for domestic dialing, which you typically drop when calling internationally.`,
+  }] : []),
   // Country-specific FAQs (hand-curated, stored in src/data/countryGuides.json)
   ...(guide?.faqs ?? []).map((f) => ({ q: f.q, a: f.a })),
 ];
@@ -54,7 +55,8 @@ const faqJsonLd = {
 ---
 
 <Layout title={title} description={description}>
-  <h1 style="margin: 22px 0 6px;">{country.name} calling code: <span class="kbd">+{country.callingCode}</span></h1>
+  <p class="eyebrow"><a href="/countries/">Country calling codes</a> / {country.name}</p>
+  <h1 style="margin: 22px 0 6px;">{country.name} country calling code: <span class="kbd">+{country.callingCode}</span></h1>
   <p class="small">
     The short answer is <span class="kbd">+{country.callingCode}</span>. The useful answer is: <strong>what do you dial</strong> from your country, and what should you do with leading zeros?
   </p>
@@ -156,7 +158,7 @@ const faqJsonLd = {
           Trunk prefix note: domestic numbers may start with <span class="kbd">{country.trunkPrefix}</span>. When calling from abroad, you usually <strong>drop</strong> that leading <span class="kbd">{country.trunkPrefix}</span>.
         </p>
       ) : (
-        <p class="small">Trunk prefix note: none listed for this country in the dataset yet.</p>
+        <p class="small">Leading-zero rules vary by numbering plan. Use the example above or the Dial Builder rather than removing a digit automatically.</p>
       )}
 
       <p>
@@ -191,15 +193,15 @@ const faqJsonLd = {
 
   <div class="card" style="margin-top: 16px;">
     <h2 style="margin-top:0">Common routes</h2>
-    <p class="small">Jump straight into the dial builder:</p>
-    <ul>
-      {topOrigins.map((from) => (
-        <li>
-          <a href={`/dial-builder/?from=${from}&to=${country.iso2}`}>Call from {from} to {country.iso2}</a>
-          <span class="small"> (exit code {exitCodes[from] ?? '—'})</span>
-        </li>
+    <p class="small">Choose where you are calling from. The dial builder will open ready for {country.name}.</p>
+    <div class="routeGrid">
+      {topOriginCountries.map((origin) => (
+        <a class="routeCard" href={`/dial-builder/?from=${origin.iso2}&to=${country.iso2}`}>
+          <span>From {origin.name}</span>
+          <small>{exitCodes[origin.iso2] ?? '+'} + {country.callingCode} + national number</small>
+        </a>
       ))}
-    </ul>
+    </div>
   </div>
 
 

@@ -33,6 +33,7 @@ for (const c of countries) {
   iso2Set.add(iso2);
 
   if (!c.name || typeof c.name !== 'string') die(`country ${iso2} missing name`);
+  if (c.name === iso2) die(`country ${iso2} still has an ISO code placeholder for its name`);
   if (!c.callingCode || typeof c.callingCode !== 'string') die(`country ${iso2} missing callingCode`);
   if (!/^[0-9]+$/.test(c.callingCode)) die(`country ${iso2} callingCode must be digits only`);
 

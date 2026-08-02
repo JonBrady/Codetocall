@@ -1,0 +1,137 @@
+<div
+  class="consentBanner"
+  id="consentBanner"
+  role="dialog"
+  aria-labelledby="consentTitle"
+  aria-describedby="consentDescription"
+  hidden
+>
+  <div class="consentBanner__content">
+    <div>
+      <strong id="consentTitle">Your privacy choices</strong>
+      <p id="consentDescription">
+        With your permission, CodeToCall uses Google Analytics to understand which pages are useful.
+        Google advertising services may also use cookies when advertising is enabled. You can accept or reject these
+        optional services.
+        <a href="/privacy-policy/">Read our privacy policy</a>.
+      </p>
+    </div>
+    <div class="consentBanner__actions">
+      <button class="btn consentButton consentButton--secondary" id="rejectConsent" type="button">Reject</button>
+      <button class="btn consentButton" id="acceptConsent" type="button">Accept</button>
+    </div>
+  </div>
+</div>
+
+<button class="consentChoices" id="openConsentChoices" type="button" hidden>
+  Privacy choices
+</button>
+
+<script>
+  const banner = document.getElementById('consentBanner');
+  const openChoices = document.getElementById('openConsentChoices');
+  const accept = document.getElementById('acceptConsent');
+  const reject = document.getElementById('rejectConsent');
+
+  type ConsentController = {
+    get: () => string | null;
+    set: (choice: 'accepted' | 'rejected') => void;
+  };
+
+  const consent = (window as Window & { codeToCallConsent?: ConsentController }).codeToCallConsent;
+
+  const showCurrentState = () => {
+    const hasChoice = Boolean(consent?.get());
+    if (banner) banner.hidden = hasChoice;
+    if (openChoices) openChoices.hidden = !hasChoice;
+  };
+
+  accept?.addEventListener('click', () => consent?.set('accepted'));
+  reject?.addEventListener('click', () => consent?.set('rejected'));
+  openChoices?.addEventListener('click', () => {
+    if (banner) banner.hidden = false;
+    if (openChoices) openChoices.hidden = true;
+    accept?.focus();
+  });
+  window.addEventListener('codetocall:consent-change', showCurrentState);
+
+  showCurrentState();
+</script>
+
+<style>
+  .consentBanner {
+    position: fixed;
+    inset: auto 14px 14px;
+    z-index: 1000;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 16px;
+    border: 1px solid #d7d1c5;
+    border-radius: 14px;
+    background: #fffdf8;
+    box-shadow: 0 12px 40px rgb(24 19 10 / 18%);
+    color: #241f17;
+  }
+
+  .consentBanner[hidden],
+  .consentChoices[hidden] {
+    display: none;
+  }
+
+  .consentBanner__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .consentBanner p {
+    max-width: 670px;
+    margin: 6px 0 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .consentBanner__actions {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+  }
+
+  .consentButton {
+    min-width: 88px;
+    cursor: pointer;
+  }
+
+  .consentButton--secondary {
+    background: #fff;
+    color: inherit;
+  }
+
+  .consentChoices {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 999;
+    padding: 7px 10px;
+    border: 1px solid #d7d1c5;
+    border-radius: 999px;
+    background: #fffdf8;
+    box-shadow: 0 4px 18px rgb(24 19 10 / 12%);
+    color: #4c4438;
+    font: inherit;
+    font-size: 0.72rem;
+    cursor: pointer;
+  }
+
+  @media (max-width: 700px) {
+    .consentBanner__content {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .consentBanner__actions {
+      justify-content: flex-end;
+    }
+  }
+</style>

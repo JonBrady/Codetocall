@@ -1,10 +1,15 @@
 ---
 import AdSlot from './AdSlot.astro';
-import AdSenseHead from './AdSenseHead.astro';
+import ConsentBanner from './ConsentBanner.astro';
+import ConsentHead from './ConsentHead.astro';
 import { ADS_RENDER } from '../lib/adsense';
+import '../styles/global.css';
 
 const { title, description, canonical } = Astro.props;
-const url = canonical ?? Astro.url;
+const siteOrigin = Astro.site ?? Astro.url.origin;
+const url = canonical
+  ? new URL(canonical.toString(), siteOrigin)
+  : new URL(Astro.url.pathname, siteOrigin);
 ---
 
 <!doctype html>
@@ -41,9 +46,7 @@ const url = canonical ?? Astro.url;
          We can match the feel with Montserrat + a heavy Montserrat weight for the hero number. -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 
-    <link rel="stylesheet" href="/styles/global.css?v=20260302-0024" />
-
-    <AdSenseHead />
+    <ConsentHead />
 
     <!-- Basic schema.org (site identity) -->
     <script type="application/ld+json" set:html={JSON.stringify({
@@ -54,6 +57,8 @@ const url = canonical ?? Astro.url;
     })} />
   </head>
   <body>
+    <ConsentBanner />
+
     <header class="site">
       <div class="container">
         <div class="row">
@@ -63,11 +68,10 @@ const url = canonical ?? Astro.url;
             </a>
             <div class="small">International dialing, made simple</div>
           </div>
-          <nav>
+          <nav class="siteNav" aria-label="Main navigation">
+            <a href="/countries/">Countries</a>
             <a href="/dial-builder/">Dial Builder</a>
             <a href="/about-data/">About</a>
-            <a href="/privacy-policy/">Privacy</a>
-            <a href="/contact/">Contact</a>
           </nav>
         </div>
       </div>
@@ -99,12 +103,12 @@ const url = canonical ?? Astro.url;
           </div>
         ) : null}
         <div class="btnRow footerNav" style="margin: 0 0 12px;">
-          <a class="btn footerBtn" href="/" aria-label="Back to homepage">← Home</a>
+          <a class="btn footerBtn" href="/" aria-label="Back to homepage">&larr; Home</a>
           <a class="btn footerBtn" href="/dial-builder/" aria-label="Open dial builder">Dial Builder</a>
         </div>
         <div class="small">
-          © {new Date().getFullYear()} CodeToCall · International dialing helper ·
-          <a href="/about-data/">About</a> · <a href="/privacy-policy/">Privacy</a> · <a href="/terms/">Terms</a>
+          &copy; {new Date().getFullYear()} CodeToCall &middot; International dialing helper &middot;
+          <a href="/about-data/">About</a> &middot; <a href="/privacy-policy/">Privacy</a> &middot; <a href="/terms/">Terms</a>
         </div>
       </div>
     </footer>

@@ -8,7 +8,12 @@
     "preview": "astro preview",
     "astro": "astro",
     "validate-data": "node scripts/validate-data.mjs",
-    "build-countries": "node scripts/build-countries.mjs"
+    "build-countries": "node scripts/build-countries.mjs",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "check": "npm test && npm run validate-data && npm run build"
+  },
+  "engines": {
+    "node": ">=22 <23"
   },
   "dependencies": {
     "astro": "^5.17.1",
